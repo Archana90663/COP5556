@@ -25,472 +25,471 @@ public class Token implements IPLPToken{
 	
 	
 	
-	public Token setKind(){
+	public Token setKind() throws Exception{
 		char c ='\0';
 		int position=0;
 		int start=0;
 		int newLength = 1;
 		State state = State.start;
+		Token t = new Token(null,0,0);
 		if(Lexer.globalInput.length() != 0) {
 			int start_line = 0;
 			int line = 0;
 			while(Lexer.globalInput.length() > position) {
 				c = Lexer.globalInput.charAt(position);
-				if(state==State.start) {
-					start = position;
-					Token t = new Token(null, 0,0);
-					if(c == '\n' || c == '\r' || c == '\t' || c=='\f' || c==' ') {
-						startLineArray.add(start_line);
-						line = line+1;
-						start_line = position+1;
-						position = position+1;
-					}
-					else if(c==';') {
-						t.kind = Kind.SEMI;
-						t.currentPosition = start;
-						t.tokenLength = newLength;
-						position = position+1;
-					}
-					else if(c==',') {
-						t.kind = Kind.COMMA;
-						t.currentPosition = start;
-						t.tokenLength = newLength;
-						position = position+1;
-					}
-					else if(c == '(') {
-						t.kind = Kind.LPAREN;
-						t.currentPosition = start;
-						t.tokenLength = newLength;
-						position = position+1;
-					}
-					else if(c == ')') {
-						t.kind = Kind.RPAREN;
-						t.currentPosition = start;
-						t.tokenLength = newLength;
-						position = position+1;
+				switch(state) {
+					case start:
+						start = position;
+						switch(c) {
+						case '\n':
+							startLineArray.add(start);
+							line++;
+							start_line = position+1;
+							position = position+1;
+							break;
+						case '\t':
+							startLineArray.add(start);
+							line++;
+							start_line = position+1;
+							position = position+1;
+							break;
+						case '\r':
+							startLineArray.add(start);
+							line++;
+							start_line = position+1;
+							position = position+1;
+							break;
+						case ' ':
+							startLineArray.add(start);
+							line++;
+							start_line = position+1;
+							position = position+1;
+							break;
+						case ';':
+							t.kind = Kind.SEMI;
+							t.currentPosition = start;
+							t.tokenLength = newLength;
+							tokensList.add(t);
+							position = position+1;
+							break;
+						case ',':
+							t.kind = Kind.COMMA;
+							t.currentPosition = start;
+							t.tokenLength = newLength;
+							tokensList.add(t);
+							position = position+1;
+							break;
+						case '(':
+							t.kind = Kind.LPAREN;
+							t.currentPosition = start;
+							t.tokenLength = newLength;
+							tokensList.add(t);
+							position = position+1;
+							break;
+						case ')':
+							t.kind = Kind.RPAREN;
+							t.currentPosition = start;
+							t.tokenLength = newLength;
+							tokensList.add(t);
+							position = position+1;
+							break;
+						case '0':
+							t.kind = Kind.INT_LITERAL;
+							t.currentPosition = start;
+							t.tokenLength = newLength;
+							tokensList.add(t);
+							position = position+1;
+							break;
+						case '&':
+							t.kind = Kind.AND;
+							t.currentPosition = start;
+							t.tokenLength = newLength;
+							tokensList.add(t);
+							position = position+1;
+							break;
+						case '*':
+							t.kind = Kind.TIMES;
+							t.currentPosition = start;
+							t.tokenLength = newLength;
+							tokensList.add(t);
+							position = position+1;
+							break;
+						case '+':
+							t.kind = Kind.PLUS;
+							t.currentPosition = start;
+							t.tokenLength = newLength;
+							tokensList.add(t);
+							position = position+1;
+							break;
+						case '!':
+							state = State.not;
+							position = position+1;
+							break;
+						case '-':
+							state = State.minus;
+							position = position+1;
+							break;
+						case '=':
+							state = State.equal_sign;
+							position = position+1;
+							break;
+						case '<':
+							state = State.greater_than;
+							position = position+1;
+							break;
+						case '>':
+							state = State.less_than;
+							position = position+1;
+							break;
+						case '|':
+							state = State.or;
+							position = position+1;
+							break;
+						case '/':
+							state = State.div;
+							position = position+1;
+							break;
+						default:
+							if(Character.isDigit(c)) {
+								state = State.integer_literal;
+								position = position+1;
+							}
+							else if(Character.isWhitespace(c)) {
+								position = position+1;
+							}
+							else if(Character.isLetter(c)) {
+								state = State.identity;
+								position = position+1;
+							}
+							else {
+								throw new Exception("Char not accepted: " + c);
+							}
 						
-					}
-					else if(c == '0') {
-						t.kind = Kind.INT_LITERAL;
-						t.currentPosition = start;
-						t.tokenLength = newLength;
-						position = position+1;
-					}
-					else if(c=='&') {
-						t.kind = Kind.AND;
-						t.currentPosition = start;
-						t.tokenLength = newLength;
-						position = position+1;
-					}
-					else if(c=='*') {
-						t.kind = Kind.TIMES;
-						t.currentPosition = start;
-						t.tokenLength = newLength;
-						position = position+1;
-					}
-					else if(c == '+') {
-						t.kind = Kind.PLUS;
-						t.currentPosition = start;
-						t.tokenLength = newLength;
-						position = position+1;
-					}
-					else if(c=='!') {
-						state = State.not;
-						position = position+1;
-					}
-					else if(c == '-') {
-						state = State.minus;
-						position = position+1;
-					}
-					else if(c == '=') {
-						state = State.equal_sign;
-						position = position+1;
-					}
-					else if(c=='|') {
-						state = State.or;
-						position = position+1;
-					}
-					else if(c == '/') {
-						state = State.div;
-						position = position+1;
-					}
-					else if(c == '<') {
-						state = State.less_than;
-						position = position+1;
-					}
-					else if(c =='>') {
-						state = State.greater_than;
-						position = position+1;
-					}
-					else if(Character.isDigit(c)) {
-						state = State.integer_literal;
-						position = position+1;
-					}
-					else if(Character.isWhitespace(c)) {
-						position = position+1;
-					}
-					else if((c == '$') || Character.isDigit(c) || Character.isLetter(c) || (c=='_') == true) {
-						state = State.identity;
-						position = position+1;
-					}
-				}
-				else if(state == State.integer_literal) {
-					if(!Character.isDigit(c)) {
-						Token t2 = new Token(null, 0, 0);
-						t2.kind = Kind.INT_LITERAL;
-						t2.currentPosition = start;
-						int length = position - start;
-						t2.tokenLength = length;
-						int v = t2.getIntValue();
-						tokensList.add(t2);
-						state = State.start;
-					}
-					else {
-						position = position+1;
-					}
-				}
-				else if(state == State.not) {
-					if(c == '=') {
-						Token t2 = new Token(null, 0, 0);
-						t2.kind = Kind.NOT_EQUALS;
-						t2.currentPosition = start;
-						t2.tokenLength = newLength+1;
-						tokensList.add(t2);
-					}
-					state = State.start;
-					
-				}
-				else if(state == State.minus) {
-					Token t2 = new Token(null, 0, 0);
-					t2.kind = Kind.MINUS;
-					t2.currentPosition = start;
-					t2.tokenLength = newLength;
-					tokensList.add(t2);
-					state = State.start;
-				}
-				else if(state == State.less_than) {
-					if(c != '=') {
-						Token t2 = new Token(null ,0,0);
-						t2.kind = Kind.LT;
-						t2.currentPosition = start;
-						int len = position - start;
-						t2.tokenLength = len;
-						tokensList.add(t2);
-			
-					}
-					state = State.start;
-				}
-				else if(state == State.equal_sign) {
-					if(c == '=') {
-						position = position+1;
-						Token t2 = new Token(null,0,0);
-						t2.kind = Kind.EQUALS;
-						t2.currentPosition = start;
-						t2.tokenLength = newLength+1;
-						tokensList.add(t2);
-						state = State.start;
-					}
-				}
-				else if(state == State.greater_than) {
-					if(c != '=') {
-						Token t2 = new Token(null, 0,0);
-						t2.kind = Kind.GT;
-						t2.currentPosition = start;
-						int len = position - start;
-						t2.tokenLength = len;
-						tokensList.add(t2);
-					}
-					state = State.start;
-				}
-				else if(state == State.or) {
-					Token t2 = new Token(null,0,0);
-					t2.kind = Kind.OR;
-					t2.currentPosition = start;
-					t2.tokenLength = newLength;
-					tokensList.add(t2);
-					state = State.start;
-				}
-				else if(state == State.div) {
-					Token t2 = new Token(null, 0,0);
-					t2.kind = Kind.DIV;
-					t2.currentPosition = start;
-					t2.tokenLength = newLength;
-					tokensList.add(t2);
-					state = State.start;
-				}
-				else if(state == State.identity) {
-					if((c == '$') || Character.isLetter(c) || Character.isDigit(c) || (c=='_') == false) {
-						String str = Lexer.globalInput.substring(start, position);
-						Kind k;				
-						if(str.equals("do")) {
-							k = Kind.KW_DO;
 						}
-						else if(str.equals("end")) {
-							k = Kind.KW_END;
-						}
-						else if(str.equals("let")) {
-							k = Kind.KW_LET;
-						}
-						else if(str.equals("switch")) {
-							k = Kind.KW_SWITCH;
-						}
-						else if(str.equals("case")) {
-							k = Kind.KW_CASE;
-						}
-						else if(str.equals("default")) {
-							k = Kind.KW_DEFAULT;
-						}
-						else if(str.equals("if")) {
-							k = Kind.KW_IF;
-						}
-						else if(str.equals("else")) {
-							k = Kind.KW_ELSE;
-						}
-						else if(str.equals("while")) {
-							k = Kind.KW_WHILE;
-						}
-						else if(str.equals("return")) {
-							k = Kind.KW_RETURN;
-						}
-						else if(str.equals("list")) {
-							k = Kind.KW_LIST;
-						}
-						else if(str.equals("var")) {
-							k = Kind.KW_VAR;
-						}
-						else if(str.equals("val")) {
-							k = Kind.KW_VAL;
-						}
-						else if(str.equals("nil")) {
-							k = Kind.KW_NIL;
-						}
-						else if(str.equals("true")) {
-							k = Kind.KW_TRUE;
-						}
-						else if(str.equals("false")) {
-							k = Kind.KW_FALSE;
-						}
-						else if(str.equals("int")) {
-							k = Kind.KW_INT;
-						}
-						else if(str.equals("String")) {
-							k = Kind.KW_STRING;
-						}
-						else if(str.equals("float")) {
-							k = Kind.KW_FLOAT;
-						}
-						else if(str.equals("boolean")) {
-							k = Kind.KW_BOOLEAN;
+						break;
+					case integer_literal:
+						if(!Character.isDigit(c)) {
+							t.kind = Kind.INT_LITERAL;
+							t.currentPosition = start;
+							t.tokenLength = position-start;
+							tokensList.add(t);
+							state = State.start;
 						}
 						else {
-							k = Kind.IDENTIFIER;
+							position = position+1;
 						}
-						Token t2 = new Token(null,0,0);
-						t2.kind = k;
-						t2.currentPosition = start;
-						int len = position - start;
-						t2.tokenLength = len;
-						tokensList.add(t2);
+						break;
+					case not:
+						if(c == '=') {
+							t.kind = Kind.NOT_EQUALS;
+							t.currentPosition= start;
+							t.tokenLength = newLength+1;
+							tokensList.add(t);
+							position = position+1;
+						}
 						state = State.start;
-					}
-					else {
-						position = position+1;
-					}
+						break;
+					case minus:
+						t.kind = Kind.MINUS;
+						t.currentPosition = start;
+						t.tokenLength = 1;
+						tokensList.add(t);
+						state = State.start;
+						break;
+					case less_than:
+						t.kind = Kind.LT;
+						t.currentPosition = start;
+						t.tokenLength = position - start;
+						tokensList.add(t);
+						state = State.start;
+						break;
+					case equal_sign:
+						if(c != '=') {
+							throw new Exception("Char not accepted: " + c);
+							
+						}
+						else {
+							t.kind = Kind.EQUALS;
+							t.currentPosition = start;
+							t.tokenLength = newLength+1;
+							position = position+1;
+							state = State.start;
+							tokensList.add(t);
+						}
+						break;
+					case greater_than:
+						t.kind = Kind.GT;
+						t.currentPosition = start;
+						t.tokenLength = position - start;
+						tokensList.add(t);
+						state = State.start;
+						break;
+					case or:
+						t.kind = Kind.OR;
+						t.currentPosition = start;
+						t.tokenLength = newLength;
+						tokensList.add(t);
+						state = State.start;
+						break;
+					case div:
+						t.kind = Kind.DIV;
+						t.currentPosition = start;
+						t.tokenLength = newLength;
+						tokensList.add(t);
+						state = State.start;
+						break;
+					case identity:
+						if(!Character.isLetter(c)) {
+							String str = Lexer.globalInput.substring(start, position);
+							if(str.equals("do")) {
+								t.kind = Kind.KW_DO;
+							}
+							else if(str.equals("end")) {
+								t.kind = Kind.KW_END;
+							}
+							else if(str.equals("let")) {
+								t.kind = Kind.KW_LET;
+							}
+							else if(str.equals("switch")) {
+								t.kind = Kind.KW_SWITCH;
+							}
+							else if(str.equals("case")) {
+								t.kind = Kind.KW_CASE;
+							}
+							else if(str.equals("default")) {
+								t.kind = Kind.KW_DEFAULT;
+							}
+							else if(str.equals("if")) {
+								t.kind = Kind.KW_IF;
+							}
+							else if(str.equals("else")) {
+								t.kind = Kind.KW_ELSE;
+							}
+							else if(str.equals("while")) {
+								t.kind = Kind.KW_WHILE;
+							}
+							else if(str.equals("return")) {
+								t.kind = Kind.KW_RETURN;
+							}
+							else if(str.equals("list")) {
+								t.kind = Kind.KW_LIST;
+							}
+							else if(str.equals("var")) {
+								t.kind = Kind.KW_VAR;
+							}
+							else if(str.equals("val")) {
+								t.kind = Kind.KW_VAL;
+							}
+							else if(str.equals("nil")) {
+								t.kind = Kind.KW_NIL;
+							}
+							else if(str.equals("true")) {
+								t.kind = Kind.KW_TRUE;
+							}
+							else if(str.equals("false")) {
+								t.kind = Kind.KW_FALSE;
+							}
+							else if(str.equals("int")) {
+								t.kind = Kind.KW_INT;
+							}
+							else if(str.equals("String")) {
+								t.kind = Kind.KW_STRING;
+							}
+							else if(str.equals("float")) {
+								t.kind = Kind.KW_FLOAT;
+							}
+							else if(str.equals("boolean")) {
+								t.kind = Kind.KW_BOOLEAN;
+							}
+							else {
+								t.kind = Kind.IDENTIFIER;
+							}
+							t.currentPosition = start;
+							t.tokenLength = position-start;
+							tokensList.add(t);
+							state = State.start;
+							
+						}
+						else {
+							position = position+1;
+						}
+						break;
 					
 					
 				}
-				
-				
-	}
+			}
+			
 			startLineArray.add(start_line);
-			
-			
-}
+		}
 		else {
 			startLineArray.add(0);
 		}
 		
-		if(state == State.integer_literal) {
-			Token t = new Token(null,0,0);
-			t.kind = Kind.INT_LITERAL;
-			t.currentPosition = start;
-			int len = position - start;
-			t.tokenLength = len;
-			tokensList.add(t);
-			Token t2 = new Token(null,0,0);
-			t2.kind = Kind.EOF;
-			t2.currentPosition = position;
-			t2.tokenLength = 0;
-			tokensList.add(t2);
+		switch(state) {
+			case integer_literal:
+				t.kind = Kind.INT_LITERAL;
+				t.currentPosition = start;
+				t.tokenLength = position-start;
+				tokensList.add(t);
+				t.kind = Kind.EOF;
+				t.currentPosition = position;
+				t.tokenLength = newLength-1;
+				tokensList.add(t);
+				break;
+			case not:
+				t.kind = Kind.NOT_EQUALS;
+				t.currentPosition = start;
+				t.tokenLength = newLength;
+				tokensList.add(t);
+				t.kind = Kind.EOF;
+				t.currentPosition = position;
+				t.tokenLength = newLength-1;
+				tokensList.add(t);
+				break;
+			case minus:
+				t.kind = Kind.MINUS;
+				t.currentPosition = start;
+				t.tokenLength = newLength;
+				tokensList.add(t);
+				t.kind = Kind.EOF;
+				t.currentPosition = position;
+				t.tokenLength = newLength-1;
+				tokensList.add(t);
+				break;
+			case less_than:
+				t.kind = Kind.LT;
+				t.currentPosition = start;
+				t.tokenLength = newLength;
+				tokensList.add(t);
+				t.kind = Kind.EOF;
+				t.currentPosition = position;
+				t.tokenLength = newLength-1;
+				tokensList.add(t);
+				break;
+			case equal_sign:
+				t.kind = Kind.EQUALS;
+				t.currentPosition = start;
+				t.tokenLength = newLength;
+				tokensList.add(t);
+				t.kind = Kind.EOF;
+				t.currentPosition = position;
+				t.tokenLength = newLength-1;
+				tokensList.add(t);
+				break;
+			case greater_than:
+				t.kind = Kind.GT;
+				t.currentPosition = start;
+				t.tokenLength = newLength;
+				tokensList.add(t);
+				t.kind = Kind.EOF;
+				t.currentPosition = position;
+				t.tokenLength = newLength-1;
+				tokensList.add(t);
+				break;
+			case or:
+				t.kind = Kind.OR;
+				t.currentPosition = start;
+				t.tokenLength = newLength;
+				tokensList.add(t);
+				t.kind = Kind.EOF;
+				t.currentPosition = position;
+				t.tokenLength = newLength-1;
+				tokensList.add(t);
+				break;
+			case div:
+				t.kind = Kind.DIV;
+				t.currentPosition = start;
+				t.tokenLength = newLength;
+				tokensList.add(t);
+				t.kind = Kind.EOF;
+				t.currentPosition = position;
+				t.tokenLength = newLength-1;
+				tokensList.add(t);
+				break;
+			case start:
+				t.kind = Kind.EOF;
+				t.currentPosition = position;
+				t.tokenLength = 0;
+				tokensList.add(t);
+				break;
+			case identity:
+				String str = Lexer.globalInput.substring(start, position);
+				if(str.equals("do")) {
+					t.kind = Kind.KW_DO;
+				}
+				else if(str.equals("end")) {
+					t.kind = Kind.KW_END;
+				}
+				else if(str.equals("let")) {
+					t.kind = Kind.KW_LET;
+				}
+				else if(str.equals("switch")) {
+					t.kind = Kind.KW_SWITCH;
+				}
+				else if(str.equals("case")) {
+					t.kind = Kind.KW_CASE;
+				}
+				else if(str.equals("default")) {
+					t.kind = Kind.KW_DEFAULT;
+				}
+				else if(str.equals("if")) {
+					t.kind = Kind.KW_IF;
+				}
+				else if(str.equals("else")) {
+					t.kind = Kind.KW_ELSE;
+				}
+				else if(str.equals("while")) {
+					t.kind = Kind.KW_WHILE;
+				}
+				else if(str.equals("return")) {
+					t.kind = Kind.KW_RETURN;
+				}
+				else if(str.equals("list")) {
+					t.kind = Kind.KW_LIST;
+				}
+				else if(str.equals("var")) {
+					t.kind = Kind.KW_VAR;
+				}
+				else if(str.equals("val")) {
+					t.kind = Kind.KW_VAL;
+				}
+				else if(str.equals("nil")) {
+					t.kind = Kind.KW_NIL;
+				}
+				else if(str.equals("true")) {
+					t.kind = Kind.KW_TRUE;
+				}
+				else if(str.equals("false")) {
+					t.kind = Kind.KW_FALSE;
+				}
+				else if(str.equals("int")) {
+					t.kind = Kind.KW_INT;
+				}
+				else if(str.equals("String")) {
+					t.kind = Kind.KW_STRING;
+				}
+				else if(str.equals("float")) {
+					t.kind = Kind.KW_FLOAT;
+				}
+				else if(str.equals("boolean")) {
+					t.kind = Kind.KW_BOOLEAN;
+				}
+				else {
+					t.kind = Kind.IDENTIFIER;
+				}
+				t.currentPosition = start;
+				t.tokenLength = position-start;
+				tokensList.add(t);
+				t.kind = Kind.EOF;
+				t.currentPosition = position;
+				t.tokenLength = 0;
+				tokensList.add(t);
+				break;
+			default:
+				throw new Exception("Char not accepted: " + c);
 		}
-		else if(state == State.not) {
-			Token t = new Token(null,0,0);
-			t.kind = Kind.NOT_EQUALS;
-			t.currentPosition = start;
-			t.tokenLength = 1;
-			Token t2 = new Token(null,0,0);
-			t2.kind = Kind.EOF;
-			t2.currentPosition = position;
-			t2.tokenLength = 0;
-			tokensList.add(t);
-			tokensList.add(t2);
-		}
-		else if(state == State.minus) {
-			Token t = new Token(null,0,0);
-			t.kind = Kind.MINUS;
-			t.currentPosition = start;
-			t.tokenLength = 1;
-			Token t2 = new Token(null,0,0);
-			t2.kind = Kind.EOF;
-			t2.currentPosition = position;
-			t2.tokenLength = 0;
-			tokensList.add(t);
-			tokensList.add(t2);
-		}
-		else if(state == State.less_than) {
-			Token t = new Token(null,0,0);
-			t.kind = Kind.LT;
-			t.currentPosition = start;
-			t.tokenLength = 1;
-			Token t2 = new Token(null,0,0);
-			t2.kind = Kind.EOF;
-			t2.currentPosition = position;
-			t2.tokenLength = 0;
-			tokensList.add(t);
-			tokensList.add(t2);
-		}
-		else if(state == State.equal_sign) {
-			Token t = new Token(null,0,0);
-			t.kind = Kind.EQUALS;
-			t.currentPosition = start;
-			t.tokenLength = 1;
-			Token t2 = new Token(null,0,0);
-			t2.kind = Kind.EOF;
-			t2.currentPosition = position;
-			t2.tokenLength = 0;
-			tokensList.add(t);
-			tokensList.add(t2);
-		}
-		else if(state == State.greater_than) {
-			Token t = new Token(null,0,0);
-			t.kind = Kind.GT;
-			t.currentPosition = start;
-			t.tokenLength = 1;
-			Token t2 = new Token(null,0,0);
-			t2.kind = Kind.EOF;
-			t2.currentPosition = position;
-			t2.tokenLength = 0;
-			tokensList.add(t);
-			tokensList.add(t2);
-		}
-		else if(state == State.or) {
-			Token t = new Token(null,0,0);
-			t.kind = Kind.OR;
-			t.currentPosition = start;
-			t.tokenLength = 1;
-			Token t2 = new Token(null,0,0);
-			t2.kind = Kind.EOF;
-			t2.currentPosition = position;
-			t2.tokenLength = 0;
-			tokensList.add(t);
-			tokensList.add(t2);
-		}
-		else if(state == State.div) {
-			Token t = new Token(null,0,0);
-			t.kind = Kind.DIV;
-			t.currentPosition = start;
-			t.tokenLength = 1;
-			Token t2 = new Token(null,0,0);
-			t2.kind = Kind.EOF;
-			t2.currentPosition = position;
-			t2.tokenLength = 0;
-			tokensList.add(t);
-			tokensList.add(t2);
-		}
-		else if(state == State.start) {
-			Token t = new Token(null,0,0);
-			t.kind = Kind.EOF;
-			t.currentPosition = position;
-			t.tokenLength = 0;
-		}
-		else if(state == State.identity) {
-			String str = Lexer.globalInput.substring(start, position);
-			Kind k;				
-			if(str.equals("do")) {
-				k = Kind.KW_DO;
-			}
-			else if(str.equals("end")) {
-				k = Kind.KW_END;
-			}
-			else if(str.equals("let")) {
-				k = Kind.KW_LET;
-			}
-			else if(str.equals("switch")) {
-				k = Kind.KW_SWITCH;
-			}
-			else if(str.equals("case")) {
-				k = Kind.KW_CASE;
-			}
-			else if(str.equals("default")) {
-				k = Kind.KW_DEFAULT;
-			}
-			else if(str.equals("if")) {
-				k = Kind.KW_IF;
-			}
-			else if(str.equals("else")) {
-				k = Kind.KW_ELSE;
-			}
-			else if(str.equals("while")) {
-				k = Kind.KW_WHILE;
-			}
-			else if(str.equals("return")) {
-				k = Kind.KW_RETURN;
-			}
-			else if(str.equals("list")) {
-				k = Kind.KW_LIST;
-			}
-			else if(str.equals("var")) {
-				k = Kind.KW_VAR;
-			}
-			else if(str.equals("val")) {
-				k = Kind.KW_VAL;
-			}
-			else if(str.equals("nil")) {
-				k = Kind.KW_NIL;
-			}
-			else if(str.equals("true")) {
-				k = Kind.KW_TRUE;
-			}
-			else if(str.equals("false")) {
-				k = Kind.KW_FALSE;
-			}
-			else if(str.equals("int")) {
-				k = Kind.KW_INT;
-			}
-			else if(str.equals("String")) {
-				k = Kind.KW_STRING;
-			}
-			else if(str.equals("float")) {
-				k = Kind.KW_FLOAT;
-			}
-			else if(str.equals("boolean")) {
-				k = Kind.KW_BOOLEAN;
-			}
-			else {
-				k = Kind.IDENTIFIER;
-			}
-			Token t = new Token(null,0,0);
-			t.kind = k;
-			t.currentPosition = start;
-			int len = position-start;
-			t.tokenLength = len;
-			Token t2 = new Token(null,0,0);
-			t2.kind = Kind.EOF;
-			t2.currentPosition = position;
-			t2.tokenLength = 0;
-		}
-		this.startLineArray = Collections.unmodifiableList(startLineArray);
 		return this;
+		
 	}
 	@Override
 	public Kind getKind() {

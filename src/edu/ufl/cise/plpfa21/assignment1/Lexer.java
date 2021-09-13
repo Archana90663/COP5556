@@ -3,7 +3,7 @@ package edu.ufl.cise.plpfa21.assignment1;
 
 public class Lexer implements IPLPLexer {
 	
-	String globalInput;
+	static String globalInput;
 	int numberOfTokens;
 	
 	public Lexer(String input) {
@@ -13,7 +13,13 @@ public class Lexer implements IPLPLexer {
 
 	@Override
 	public IPLPToken nextToken() throws LexicalException {
-			Token t = Token.tokensList.get(numberOfTokens);
+			Token t = new Token(null,0,0);
+			try {
+				t = Token.tokensList.get(numberOfTokens).setKind();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			numberOfTokens++;
 			return t;
 		
