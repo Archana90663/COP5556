@@ -21,11 +21,16 @@ public class Token implements IPLPToken{
 	}
 	
 	static ArrayList<Token> tokensList = new ArrayList<>();
-	List<Integer> startLineArray = new ArrayList<>();
+	static List<Integer> startLineArray = new ArrayList<>();
 	
 	
 	
-	public Token setKind() throws Exception{
+	
+	
+	public static void setKind() throws Exception{
+		for(int i=0; i<tokensList.size(); i++) {
+			System.out.println("Before method starts: " + tokensList.get(i).kind);
+		}
 		char c ='\0';
 		int position=0;
 		int start=0;
@@ -157,13 +162,13 @@ public class Token implements IPLPToken{
 							else if(Character.isWhitespace(c)) {
 								position = position+1;
 							}
-							else if(Character.isLetter(c)) {
+							else {
 								state = State.identity;
 								position = position+1;
 							}
-							else {
-								throw new Exception("Char not accepted: " + c);
-							}
+//							else {
+//								throw new Exception("Char not accepted: " + c);
+//							}
 						
 						}
 						break;
@@ -173,6 +178,11 @@ public class Token implements IPLPToken{
 							t.currentPosition = start;
 							t.tokenLength = position-start;
 							tokensList.add(t);
+							try {
+								int num = t.getIntValue();
+							} catch(Exception e) {
+								throw new Exception("Character not accepted: " + c);
+							}
 							state = State.start;
 						}
 						else {
@@ -204,18 +214,12 @@ public class Token implements IPLPToken{
 						state = State.start;
 						break;
 					case equal_sign:
-						if(c != '=') {
-							throw new Exception("Char not accepted: " + c);
-							
-						}
-						else {
-							t.kind = Kind.EQUALS;
-							t.currentPosition = start;
-							t.tokenLength = newLength+1;
-							position = position+1;
-							state = State.start;
-							tokensList.add(t);
-						}
+						t.kind = Kind.EQUALS;
+						t.currentPosition = start;
+						t.tokenLength = newLength+1;
+						position = position+1;
+						state = State.start;
+						tokensList.add(t);
 						break;
 					case greater_than:
 						t.kind = Kind.GT;
@@ -239,7 +243,7 @@ public class Token implements IPLPToken{
 						state = State.start;
 						break;
 					case identity:
-						if(!Character.isLetter(c)) {
+						if(!Character.isLetter(c) && !Character.isDigit(c)) {
 							String str = Lexer.globalInput.substring(start, position);
 							if(str.equals("do")) {
 								t.kind = Kind.KW_DO;
@@ -308,6 +312,11 @@ public class Token implements IPLPToken{
 							t.tokenLength = position-start;
 							tokensList.add(t);
 							state = State.start;
+							for(int i=0; i<tokensList.size(); i++) {
+								System.out.println("first: " + tokensList.get(i).kind);
+								
+							}
+							System.out.println("\n");
 							
 						}
 						else {
@@ -331,6 +340,11 @@ public class Token implements IPLPToken{
 				t.currentPosition = start;
 				t.tokenLength = position-start;
 				tokensList.add(t);
+				try {
+					int num = t.getIntValue();
+				} catch(Exception e) {
+					throw new Exception("Character not accepted: " + c);
+				}
 				t.kind = Kind.EOF;
 				t.currentPosition = position;
 				t.tokenLength = newLength-1;
@@ -480,22 +494,29 @@ public class Token implements IPLPToken{
 				t.currentPosition = start;
 				t.tokenLength = position-start;
 				tokensList.add(t);
+				System.out.println("Before: " + tokensList.get(tokensList.size()-1));
 				t.kind = Kind.EOF;
 				t.currentPosition = position;
-				t.tokenLength = 0;
+				t.tokenLength = newLength-1;
 				tokensList.add(t);
+				System.out.println("After: " + tokensList.get(tokensList.size()-1));
 				break;
 			default:
 				throw new Exception("Char not accepted: " + c);
 		}
-		return this;
+		
 		
 	}
 	@Override
 	public Kind getKind() {
-		if(kind != null)
-			return kind;
+		for(int i=0; i<tokensList.size(); i++) {
+			System.out.println(tokensList.get(i).kind);
+		}
+		if(this.kind != null)
+			return this.kind;
+		
 		return null;
+		
 	}
 
 	@Override

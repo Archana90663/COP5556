@@ -1,5 +1,6 @@
 package edu.ufl.cise.plpfa21.assignment1;
 
+import java.util.ArrayList;
 
 public class Lexer implements IPLPLexer {
 	
@@ -9,16 +10,21 @@ public class Lexer implements IPLPLexer {
 	public Lexer(String input) {
 		this.globalInput = input;
 		this.numberOfTokens = 0;
+		Token.tokensList = new ArrayList<>();
 	}
 
 	@Override
 	public IPLPToken nextToken() throws LexicalException {
 			Token t = new Token(null,0,0);
 			try {
-				t = Token.tokensList.get(numberOfTokens).setKind();
+				for(int i=0; i<Token.tokensList.size(); i++) {
+					System.out.println("Initial: " + Token.tokensList.get(i).kind);
+				}
+				Token.setKind();
+				t = Token.tokensList.get(numberOfTokens);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new LexicalException("Invalid token", t.getLine(), t.getCharPositionInLine());
 			}
 			numberOfTokens++;
 			return t;
