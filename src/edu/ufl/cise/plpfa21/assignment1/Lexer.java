@@ -164,13 +164,13 @@ public class Lexer implements IPLPLexer {
 							else if(Character.isWhitespace(c)) {
 								position = position+1;
 							}
-							else if(Character.isLetter(c)){
+							else{
 								state = State.identity;
 								position = position+1;
 							}
-							else {
-								throw new LexicalException("Invalid token", line, position-start_line);
-							}
+//							else {
+//								throw new LexicalException("Invalid token", line, position-start_line);
+//							}
 						
 						}
 						break;
@@ -182,9 +182,9 @@ public class Lexer implements IPLPLexer {
 //							t.tokenLength = position-start;
 							try {
 								int num = token.getIntValue();
+								tokensList.add(token);
 							} catch(Exception e) {
 								throw new LexicalException("Invalid token", token.getLine(), token.getCharPositionInLine());							}
-							tokensList.add(token);
 							state = State.start;
 						}
 						else {
@@ -221,8 +221,9 @@ public class Lexer implements IPLPLexer {
 //							t6.kind = Kind.EQUALS;
 //							t6.currentPosition = start;
 //							t6.tokenLength = newLength+1;
-							tokensList.add(new Token(Kind.EQUALS, start, newLength+1));
+//							tokensList.add(new Token(Kind.EQUALS, start, newLength+1));
 							position = position+1;
+							tokensList.add(new Token(Kind.EQUALS, start, position-start));
 							state = State.start;
 //							tokensList.add(t6);
 						}
@@ -230,7 +231,7 @@ public class Lexer implements IPLPLexer {
 //							t.kind = Kind.ASSIGN;
 //							t.currentPosition = start;
 //							t.tokenLength = newLength+1;
-							tokensList.add(new Token(Kind.ASSIGN, start, newLength+1));
+							tokensList.add(new Token(Kind.ASSIGN, start, position-start));
 							position = position+1;
 							state = State.start;
 //							tokensList.add(t);
@@ -355,10 +356,10 @@ public class Lexer implements IPLPLexer {
 //				tokensList.add(t);
 				try {
 					int num = token.getIntValue();
+					tokensList.add(token);
 				} catch(Exception e) {
 					throw new LexicalException("Invalid token", token.getLine(), token.getCharPositionInLine());
 				}
-				tokensList.add(token);
 //				Token t2 = new Token(null,0,0);
 //				t2.kind = Kind.EOF;
 //				t2.currentPosition = position;
@@ -536,12 +537,17 @@ public class Lexer implements IPLPLexer {
 
 	@Override
 	public IPLPToken nextToken() throws LexicalException {
+			for(int i=0; i<tokensList.size(); i++) {
+				System.out.println("Kind: " + tokensList.get(i).kind + " Text: " + tokensList.get(i).getText());
+			}
 			Token t = new Token(null,0,0);
 			try {
 				if(numberOfTokens==0) {
 					this.scanToken();
 				}
+				System.out.println(numberOfTokens);
 				t = tokensList.get(numberOfTokens);
+				System.out.println("Token NUmber: " + numberOfTokens + " Kind: " + t.kind + " Text: " + t.getText());
 //				for(int i=0; i<tokensList.size(); i++) {
 //					System.out.println("Token from list: " + tokensList.get(i).kind + " Line: " + t.getLine() + " Char in position Line: " + t.getCharPositionInLine());
 //				}

@@ -21,9 +21,6 @@ public class Token implements IPLPToken{
 	
 	@Override
 	public Kind getKind() {
-		for(int i=0; i<Lexer.tokensList.size(); i++) {
-			System.out.println(Lexer.tokensList.get(i).kind);
-		}
 		if(this.kind != null)
 			return this.kind;
 		
