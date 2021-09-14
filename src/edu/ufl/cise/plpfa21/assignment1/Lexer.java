@@ -73,7 +73,7 @@ public class Lexer implements IPLPLexer {
 							position = position+1;
 							break;
 						case ',':
-							t.kind = Kind.COMMA;
+							t.kind = Kind.SEMI;
 							t.currentPosition = start;
 							t.tokenLength = newLength;
 							tokensList.add(t);
@@ -519,7 +519,7 @@ public class Lexer implements IPLPLexer {
 				this.scanToken();
 				t = tokensList.get(numberOfTokens);
 				for(int i=0; i<tokensList.size(); i++) {
-					System.out.println("Token from list: " + tokensList.get(i).kind);
+					System.out.println("Token from list: " + tokensList.get(i).kind + " Line: " + t.getLine() + " Char in position Line: " + t.getCharPositionInLine());
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

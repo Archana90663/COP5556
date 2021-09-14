@@ -51,7 +51,7 @@ public class Token implements IPLPToken{
 	@Override
 	public int getLine() {
 		int index=0;
-		index = Collections.binarySearch(Lexer.startLineArray, currentPosition)+1;
+		index = Collections.binarySearch(Lexer.startLineArray, this.currentPosition)+1;
 		int line = 0;
 		line = index < 0 ? Math.abs(index+2) : index;
 		return line;
@@ -67,7 +67,7 @@ public class Token implements IPLPToken{
 		 * 
 		 * @return  The position of the first character of this token in the line.  Counting starts at 0.
 		 */
-		return currentPosition - Lexer.startLineArray.get(this.getLine()-1);
+		return this.currentPosition - Lexer.startLineArray.get(this.getLine()-1);
 	}
 
 	@Override
