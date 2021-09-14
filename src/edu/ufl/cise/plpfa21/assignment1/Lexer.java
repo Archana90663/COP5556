@@ -223,6 +223,7 @@ public class Lexer implements IPLPLexer {
 //							t6.tokenLength = newLength+1;
 							tokensList.add(new Token(Kind.EQUALS, start, newLength+1));
 							position = position+1;
+							state = State.start;
 //							tokensList.add(t6);
 						}
 						else {
@@ -328,7 +329,6 @@ public class Lexer implements IPLPLexer {
 //							t.tokenLength = position-start;
 //							tokensList.add(t);
 							state = State.start;
-							System.out.println("\n");
 							
 						}
 						else {
@@ -348,17 +348,17 @@ public class Lexer implements IPLPLexer {
 		
 		switch(state) {
 			case integer_literal:
-				Token token2 = new Token(Kind.INT_LITERAL, start, position-start);
+				Token token = new Token(Kind.INT_LITERAL, start, position-start);
 //				t.kind = Kind.INT_LITERAL;
 //				t.currentPosition = start;
 //				t.tokenLength = position-start;
 //				tokensList.add(t);
 				try {
-					int num = token2.getIntValue();
+					int num = token.getIntValue();
 				} catch(Exception e) {
-					throw new LexicalException("Invalid token", token2.getLine(), token2.getCharPositionInLine());
+					throw new LexicalException("Invalid token", token.getLine(), token.getCharPositionInLine());
 				}
-				tokensList.add(token2);
+				tokensList.add(token);
 //				Token t2 = new Token(null,0,0);
 //				t2.kind = Kind.EOF;
 //				t2.currentPosition = position;
@@ -398,7 +398,7 @@ public class Lexer implements IPLPLexer {
 //				tokensList.add(t);
 //				break;
 			case equal_sign:
-				tokensList.add(new Token(Kind.EQUALS, start, newLength));
+				tokensList.add(new Token(Kind.ASSIGN, start, newLength));
 //				t.kind = Kind.EQUALS;
 //				t.currentPosition = start;
 //				t.tokenLength = newLength;
@@ -446,7 +446,7 @@ public class Lexer implements IPLPLexer {
 //				t4.currentPosition = position;
 //				t4.tokenLength = newLength;
 //				tokensList.add(t4);
-				tokensList.add(new Token(Kind.EOF, position, newLength));
+				tokensList.add(new Token(Kind.EOF, position, newLength-1));
 				break;
 			case identity:
 				String str = globalInput.substring(start, position);
@@ -547,7 +547,7 @@ public class Lexer implements IPLPLexer {
 //				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				throw new LexicalException("Invalid token", t.getLine(), t.getCharPositionInLine());
+				throw new LexicalException("Invalid token", 0, 0);
 			}
 			numberOfTokens++;
 			return t;
