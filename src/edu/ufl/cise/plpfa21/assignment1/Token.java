@@ -49,9 +49,10 @@ public class Token implements IPLPToken{
 	public int getLine() {
 		int index=0;
 		index = Collections.binarySearch(Lexer.startLineArray, this.currentPosition)+1;
-		int line = 0;
-		line = index < 0 ? Math.abs(index+2) : index;
-		return line;
+		if(index >= 0) {
+			return index;
+		}
+		return Math.abs(index+2);
 		/**
 		 * @return  The line number of first character of this token in the input.  Counting starts at 1.
 		 */

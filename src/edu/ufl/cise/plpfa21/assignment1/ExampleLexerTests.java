@@ -46,7 +46,6 @@ class ExampleLexerTests implements PLPTokenKinds {
 		}
 		{
 			IPLPToken token = lexer.nextToken();
-			System.out.println("Test: " + token.getText());
 			Kind kind = token.getKind();
 			assertEquals(kind, Kind.IDENTIFIER);
 			int line = token.getLine();

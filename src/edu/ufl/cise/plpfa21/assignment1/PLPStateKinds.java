@@ -13,7 +13,9 @@ public interface PLPStateKinds {
 		or,
 		identity,
 		minus,
-		div
+		div,
+		comment,
+		close_comment
 	}
 
 }

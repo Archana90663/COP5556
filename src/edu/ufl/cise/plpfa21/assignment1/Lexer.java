@@ -23,9 +23,6 @@ public class Lexer implements IPLPLexer {
 	}
 	
 	public void scanToken() throws LexicalException{
-		for(int i=0; i<tokensList.size(); i++) {
-			System.out.println("Before method starts: " + tokensList.get(i).kind);
-		}
 		char c ='\0';
 		int position=0;
 		int start=0;
@@ -34,50 +31,32 @@ public class Lexer implements IPLPLexer {
 		Token t = new Token(null,0,0);
 		if(globalInput.length() != 0) {
 			int start_line = 0;
-			int line = 0;
 			while(globalInput.length() > position) {
 				c = globalInput.charAt(position);
 				switch(state) {
 					case start:
 						start = position;
 						switch(c) {
-						case '\n':
+						case '\r':
 							startLineArray.add(start_line);
-							line++;
 							start_line = position+1;
 							position = position+1;
 							break;
-//						case '\t':
-//							startLineArray.add(start_line);
-//							line++;
-//							start_line = position+1;
-//							position = position+1;
-//							break;
-//						case '\r':
-//							startLineArray.add(start_line);
-//							line++;
-//							start_line = position+1;
-//							position = position+1;
-//							break;
-//						case ' ':
-//							startLineArray.add(start_line);
-//							line++;
-//							start_line = position+1;
-//							position = position+1;
-//							break;
+						case '\n':
+							startLineArray.add(start_line);
+							start_line = position+1;
+							position = position+1;
+							break;
+						case '\t':
+							startLineArray.add(start_line);
+							start_line = position+1;
+							position = position+1;
+							break;
 						case ';':
-//							t.kind = Kind.SEMI;
-//							t.currentPosition = start;
-//							t.tokenLength = newLength;
-//							tokensList.add(t);
 							tokensList.add(new Token(Kind.SEMI, start, newLength));
 							position = position+1;
 							break;
 						case ',':
-//							t.kind = Kind.COMMA;
-//							t.currentPosition = start;
-//							t.tokenLength = newLength;
-//							tokensList.add(t);
 							tokensList.add(new Token(Kind.COMMA, start, newLength));
 							position = position+1;
 							break;
@@ -86,76 +65,61 @@ public class Lexer implements IPLPLexer {
 							position = position+1;
 							break;
 						case ')':
-//							t.kind = Kind.RPAREN;
-//							t.currentPosition = start;
-//							t.tokenLength = newLength;
-//							tokensList.add(t);
 							tokensList.add(new Token(Kind.RPAREN, start, newLength));
 							position = position+1;
 							break;
+						case '[':
+							tokensList.add(new Token(Kind.LSQUARE, start, newLength));
+							position = position+1;
+							break;
+						case ']':
+							tokensList.add(new Token(Kind.RSQUARE, start, newLength));
+							position = position+1;
+							break;
+						case '<':
+							tokensList.add(new Token(Kind.LT, start, newLength));
+							position = position+1;
+							break;
+						case '>':
+							tokensList.add(new Token(Kind.GT, start, newLength));
+							position = position+1;
+							break;
 						case '0':
-//							t.kind = Kind.INT_LITERAL;
-//							t.currentPosition = start;
-//							t.tokenLength = newLength;
-//							tokensList.add(t);
 							tokensList.add(new Token(Kind.INT_LITERAL, start, newLength));
 							position = position+1;
 							break;
 						case '&':
-//							t.kind = Kind.AND;
-//							t.currentPosition = start;
-//							t.tokenLength = newLength;
-//							tokensList.add(t);
 							tokensList.add(new Token(Kind.AND, start, newLength));
-
 							position = position+1;
 							break;
-						case '*':
-//							t.kind = Kind.TIMES;
-//							t.currentPosition = start;
-//							t.tokenLength = newLength;
-//							tokensList.add(t);
-							tokensList.add(new Token(Kind.TIMES, start, newLength));
-
-							position = position+1;
-							break;
-						case '+':
-//							t.kind = Kind.PLUS;
-//							t.currentPosition = start;
-//							t.tokenLength = newLength;
-//							tokensList.add(t);
-							tokensList.add(new Token(Kind.PLUS, start, newLength));
-
-							position = position+1;
-							break;
-//						case '!':
-//							state = State.not;
-//							position = position+1;
-//							break;
-//						case '-':
-//							state = State.minus;
-//							position = position+1;
-//							break;
 						case '=':
 							state = State.equal_sign;
 							position = position+1;
 							break;
-//						case '<':
-//							state = State.greater_than;
-//							position = position+1;
-//							break;
-//						case '>':
-//							state = State.less_than;
-//							position = position+1;
-//							break;
-//						case '|':
-//							state = State.or;
-//							position = position+1;
-//							break;
-//						case '/':
-//							state = State.div;
-//							position = position+1;
-//							break;
+						case '-':
+							tokensList.add(new Token(Kind.MINUS, start, newLength));
+							position = position+1;
+							break;
+						case '*':
+							tokensList.add(new Token(Kind.TIMES, start, newLength));
+							position = position+1;
+							break;
+						case '/':
+							state = State.div;
+							position = position+1;
+							break;
+						case '+':
+							tokensList.add(new Token(Kind.PLUS, start, newLength));
+							position = position+1;
+							break;
+						case '|':
+							tokensList.add(new Token(Kind.OR, start, newLength));
+							position = position+1;
+							break;
+						case '!':
+							state = State.not;
+							position = position+1;
+							break;
 						default:
 							if(Character.isDigit(c)) {
 								state = State.integer_literal;
@@ -164,102 +128,91 @@ public class Lexer implements IPLPLexer {
 							else if(Character.isWhitespace(c)) {
 								position = position+1;
 							}
-							else{
+							else if(Character.isJavaIdentifierPart(c)){
 								state = State.identity;
 								position = position+1;
 							}
-//							else {
-//								throw new LexicalException("Invalid token", line, position-start_line);
-//							}
+							else {
+								tokensList.add(new Token(null,0,0));
+								position = position+1;
+							}
 						
 						}
 						break;
 					case integer_literal:
 						if(!Character.isDigit(c)) {
 							Token token = new Token(Kind.INT_LITERAL, start, position-start);
-//							t.kind = Kind.INT_LITERAL;
-//							t.currentPosition = start;
-//							t.tokenLength = position-start;
 							try {
-								int num = token.getIntValue();
-								tokensList.add(token);
+								int num = Integer.parseInt(token.getText());
 							} catch(Exception e) {
 								throw new LexicalException("Invalid token", token.getLine(), token.getCharPositionInLine());							}
 							state = State.start;
+							tokensList.add(token);
+
 						}
 						else {
 							position = position+1;
 						}
 						break;
-//					case not:
-//						if(c == '=') {
-//							t.kind = Kind.NOT_EQUALS;
-//							t.currentPosition= start;
-//							t.tokenLength = newLength+1;
-//							tokensList.add(t);
-//							position = position+1;
-//						}
-//						state = State.start;
-//						break;
-//					case minus:
-//						t.kind = Kind.MINUS;
-//						t.currentPosition = start;
-//						t.tokenLength = 1;
-//						tokensList.add(t);
-//						state = State.start;
-//						break;
-//					case less_than:
-//						t.kind = Kind.LT;
-//						t.currentPosition = start;
-//						t.tokenLength = position - start;
-//						tokensList.add(t);
-//						state = State.start;
-//						break;
-					case equal_sign:
-						if(c == '=') {
-//							Token t6 = new Token(null,0,0);
-//							t6.kind = Kind.EQUALS;
-//							t6.currentPosition = start;
-//							t6.tokenLength = newLength+1;
-//							tokensList.add(new Token(Kind.EQUALS, start, newLength+1));
-							position = position+1;
-							tokensList.add(new Token(Kind.EQUALS, start, position-start));
-							state = State.start;
-//							tokensList.add(t6);
+					case div:
+						if(c != '*') {
+							tokensList.add(new Token(Kind.DIV, start, newLength));
+							state = State.start;	
 						}
 						else {
-//							t.kind = Kind.ASSIGN;
-//							t.currentPosition = start;
-//							t.tokenLength = newLength+1;
+							state = State.comment;
+							position = position+1;
+						}					
+						break;
+					case equal_sign:
+						if(c == '=') {
+							position = position+1;
+							tokensList.add(new Token(Kind.EQUALS, start, newLength+1));
+							state = State.start;
+						}
+						else {
 							tokensList.add(new Token(Kind.ASSIGN, start, position-start));
 							position = position+1;
 							state = State.start;
 //							tokensList.add(t);
 						}
+						break;									
+					case not:
+						if(c == '=') {
+							tokensList.add(new Token(Kind.NOT_EQUALS, start, newLength+1));
+							position = position+1;
+						}
+						state = State.start;
 						break;
-//					case greater_than:
-//						t.kind = Kind.GT;
-//						t.currentPosition = start;
-//						t.tokenLength = position - start;
-//						tokensList.add(t);
-//						state = State.start;
-//						break;
-//					case or:
-//						t.kind = Kind.OR;
-//						t.currentPosition = start;
-//						t.tokenLength = newLength;
-//						tokensList.add(t);
-//						state = State.start;
-//						break;
-//					case div:
-//						t.kind = Kind.DIV;
-//						t.currentPosition = start;
-//						t.tokenLength = newLength;
-//						tokensList.add(t);
-//						state = State.start;
-//						break;
+					case comment:
+						if(c == '\n') {
+							startLineArray.add(start_line);
+							start_line = position+1;
+							
+						}
+						else if(c == '*') {
+							state = State.close_comment;
+						}
+						position = position+1;
+						break;
+					case close_comment:
+						if(c=='*') {
+							state = State.close_comment;
+						}
+						else if(c == '/') {
+							state = State.start;
+						}
+						else {
+							if(c == '\n') {
+								startLineArray.add(start_line);
+								start_line = position+1;
+							}
+							state = State.comment;
+						}
+						position = position+1;
+						break;
 					case identity:
-						if(!Character.isLetter(c) && !Character.isDigit(c)) {
+						if(!Character.isJavaIdentifierPart(c)) {
 							String str = globalInput.substring(start, position);
 							Kind kind;
 							if(str.equals("do")) {
@@ -348,105 +301,29 @@ public class Lexer implements IPLPLexer {
 		}
 		
 		switch(state) {
+			case start:
+				tokensList.add(new Token(Kind.EOF, position, newLength-1));
+				break;
 			case integer_literal:
 				Token token = new Token(Kind.INT_LITERAL, start, position-start);
-//				t.kind = Kind.INT_LITERAL;
-//				t.currentPosition = start;
-//				t.tokenLength = position-start;
-//				tokensList.add(t);
 				try {
 					int num = token.getIntValue();
-					tokensList.add(token);
 				} catch(Exception e) {
 					throw new LexicalException("Invalid token", token.getLine(), token.getCharPositionInLine());
 				}
-//				Token t2 = new Token(null,0,0);
-//				t2.kind = Kind.EOF;
-//				t2.currentPosition = position;
-//				t2.tokenLength = newLength-1;
-//				tokensList.add(t2);
+				tokensList.add(token);
 				tokensList.add(new Token(Kind.EOF, position, newLength-1));
 
 				break;
-//			case not:
-//				t.kind = Kind.NOT_EQUALS;
-//				t.currentPosition = start;
-//				t.tokenLength = newLength;
-//				tokensList.add(t);
-//				t.kind = Kind.EOF;
-//				t.currentPosition = position;
-//				t.tokenLength = newLength-1;
-//				tokensList.add(t);
-//				break;
-//			case minus:
-//				t.kind = Kind.MINUS;
-//				t.currentPosition = start;
-//				t.tokenLength = newLength;
-//				tokensList.add(t);
-//				t.kind = Kind.EOF;
-//				t.currentPosition = position;
-//				t.tokenLength = newLength-1;
-//				tokensList.add(t);
-//				break;
-//			case less_than:
-//				t.kind = Kind.LT;
-//				t.currentPosition = start;
-//				t.tokenLength = newLength;
-//				tokensList.add(t);
-//				t.kind = Kind.EOF;
-//				t.currentPosition = position;
-//				t.tokenLength = newLength-1;
-//				tokensList.add(t);
-//				break;
-			case equal_sign:
-				tokensList.add(new Token(Kind.ASSIGN, start, newLength));
-//				t.kind = Kind.EQUALS;
-//				t.currentPosition = start;
-//				t.tokenLength = newLength;
-//				tokensList.add(t);
-//				Token t3 = new Token(null,0,0);
-//				t3.kind = Kind.EOF;
-//				t3.currentPosition = position;
-//				t3.tokenLength = newLength-1;
-//				tokensList.add(t3);
+			case not:
+				tokensList.add(new Token(Kind.NOT_EQUALS, start, newLength));
 				tokensList.add(new Token(Kind.EOF, position, newLength-1));
 				break;
-//			case greater_than:
-//				t.kind = Kind.GT;
-//				t.currentPosition = start;
-//				t.tokenLength = newLength;
-//				tokensList.add(t);
-//				t.kind = Kind.EOF;
-//				t.currentPosition = position;
-//				t.tokenLength = newLength-1;
-//				tokensList.add(t);
-//				break;
-//			case or:
-//				t.kind = Kind.OR;
-//				t.currentPosition = start;
-//				t.tokenLength = newLength;
-//				tokensList.add(t);
-//				t.kind = Kind.EOF;
-//				t.currentPosition = position;
-//				t.tokenLength = newLength-1;
-//				tokensList.add(t);
-//				break;
-//			case div:
-//				t.kind = Kind.DIV;
-//				t.currentPosition = start;
-//				t.tokenLength = newLength;
-//				tokensList.add(t);
-//				t.kind = Kind.EOF;
-//				t.currentPosition = position;
-//				t.tokenLength = newLength-1;
-//				tokensList.add(t);
-//				break;
-			case start:
-//				Token t4 = new Token(null,0,0);
-//				t4.kind = Kind.EOF;
-//				t4.currentPosition = position;
-//				t4.tokenLength = newLength;
-//				tokensList.add(t4);
+			case close_comment:
+				tokensList.add(new Token(Kind.EOF, position, newLength-1));
+				break;
+			case div:
+				tokensList.add(new Token(Kind.DIV, start, newLength));
 				tokensList.add(new Token(Kind.EOF, position, newLength-1));
 				break;
 			case identity:
@@ -516,17 +393,7 @@ public class Lexer implements IPLPLexer {
 					kind = Kind.IDENTIFIER;
 				}
 				tokensList.add(new Token(kind, start, position-start));
-//				t.currentPosition = start;
-//				t.tokenLength = position-start;
-//				tokensList.add(t);
-				System.out.println("Before: " + tokensList.get(tokensList.size()-1));
-//				Token t5 = new Token(null,0,0);
-//				t5.kind = Kind.EOF;
-//				t5.currentPosition = position;
-//				t5.tokenLength = newLength-1;
-//				tokensList.add(t5);
 				tokensList.add(new Token(Kind.EOF, position, newLength-1));
-				System.out.println("After: " + tokensList.get(tokensList.size()-1));
 				break;
 			default:
 				throw new LexicalException("Invalid token", t.getLine(), t.getCharPositionInLine());
@@ -537,20 +404,15 @@ public class Lexer implements IPLPLexer {
 
 	@Override
 	public IPLPToken nextToken() throws LexicalException {
-			for(int i=0; i<tokensList.size(); i++) {
-				System.out.println("Kind: " + tokensList.get(i).kind + " Text: " + tokensList.get(i).getText());
-			}
 			Token t = new Token(null,0,0);
 			try {
 				if(numberOfTokens==0) {
 					this.scanToken();
 				}
-				System.out.println(numberOfTokens);
 				t = tokensList.get(numberOfTokens);
-				System.out.println("Token NUmber: " + numberOfTokens + " Kind: " + t.kind + " Text: " + t.getText());
-//				for(int i=0; i<tokensList.size(); i++) {
-//					System.out.println("Token from list: " + tokensList.get(i).kind + " Line: " + t.getLine() + " Char in position Line: " + t.getCharPositionInLine());
-//				}
+				if(t.kind == null) {
+					throw new Exception();
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				throw new LexicalException("Invalid token", 0, 0);
