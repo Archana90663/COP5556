@@ -15,19 +15,49 @@ public class Parser implements IPLPParser{
 
 	public Token token;
 	public Lexer lexer;
-	public HashMap<Token, Token> tokensMap = new HashMap<>();
+	public String globalInput;
 	
-	public Parser(Token token, Lexer lexer) {
-		this.token = token;
-		this.lexer = lexer;
+	public Parser(String globalInput) {
+		this.globalInput = globalInput;
 	}
 	
 	@Override	
 	public void parse() throws Exception {
 		Kind kind = this.token.kind;
 		switch(kind) {
-			case 
+			case EOF:
+				return;
+			case IDENTIFIER:
+				Token t = this.token;
+				this.token = (Token)lexer.nextToken();
+				break;
+			case INT_LITERAL:
+				Token t2 = this.token;
+				this.token = (Token)lexer.nextToken();
+				break;
+			case KW_TRUE:
+				Token t3 = this.token;
+				this.token = (Token)lexer.nextToken();
+				break;
+			case LPAREN:
+				Token t4 = this.token;
+				this.token = (Token)lexer.nextToken();
+				for(Kind k : Kind.values()) {
+					if(this.token.kind.equals(k)) {
+						Token t5 = this.token;
+						this.token = (Token)lexer.nextToken();
+					}
+				}
+				break;
+			default:
+				throw new SyntaxException(this.globalInput, this.token.getLine(), this.token.getCharPositionInLine());
 		}
 	}
+	
+//	public Token parserToken() throws SyntaxException {
+//		Token t = this.token;
+//		this.token = lexer.nextToken();
+//		return t;
+//	}
 
 }
