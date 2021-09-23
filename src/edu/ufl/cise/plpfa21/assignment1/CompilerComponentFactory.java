@@ -13,12 +13,23 @@ public class CompilerComponentFactory{
 	}
 	
 	public static IPLPParser getParser(String input) {
-		Parser parser = new Parser(input);
+//		Parser parser = new Parser(input);
+		Lexer lexer = new Lexer(input);
+		Parser parser = new Parser(lexer);
 		return parser;
 	   	 //Implement this in Assignment 2
 	   	 //Your parser will create a lexer.
 		
 	    }
+	
 
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
