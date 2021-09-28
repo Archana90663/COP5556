@@ -31,25 +31,25 @@ public class Parser implements IPLPParser{
 			Kind kind = this.token.getKind();
 			switch(kind) {
 				case EOF:
-					if(this.token.getKind().equals(Kind.EOF)) {
-						return;
-					}
-					break;
+					return;
 				case IDENTIFIER:
-					this.token = lexer.nextToken();
+					nextOne();
 					break;
 				case INT_LITERAL:
-					this.token = lexer.nextToken();
+					nextOne();					
 					break;
 				case KW_TRUE:
-					this.token = lexer.nextToken();
+					nextOne();
 					break;
 				case KW_FALSE:
-					this.token = lexer.nextToken();
+					nextOne();
 					break;
 				case LPAREN:
-					this.token = lexer.nextToken();
+					nextOne();
 					equal(Kind.RPAREN);
+					break;
+				case SEMI:
+					nextOne();
 					break;
 				default:
 					throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
@@ -69,6 +69,17 @@ public class Parser implements IPLPParser{
 			}
 		
 		throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
+	}
+	
+	public IPLPToken nextOne() throws SyntaxException {
+		IPLPToken token2 = this.token;
+		try {
+			this.token = lexer.nextToken();
+		} catch (LexicalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return token2;
 	}
 	
 		

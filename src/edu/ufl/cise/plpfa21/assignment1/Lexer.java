@@ -9,9 +9,9 @@ import edu.ufl.cise.plpfa21.assignment1.PLPTokenKinds.Kind;
 
 public class Lexer implements IPLPLexer {
 	
-	static String globalInput;
+	public static String globalInput;
 	int numberOfTokens;
-	static ArrayList<Token> tokensList;
+	public static ArrayList<Token> tokensList;
 	static List<Integer> startLineArray;
 	
 	public Lexer(String input) {
