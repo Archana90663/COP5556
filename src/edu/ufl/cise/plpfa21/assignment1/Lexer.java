@@ -327,66 +327,66 @@ public class Lexer implements IPLPLexer {
 				tokensList.add(new Token(Kind.EOF, position, newLength-1));
 				break;
 			case identity:
-				String str = globalInput.substring(start, position);
+				String str = globalInput.substring(start, position-start);
 				Kind kind;
-				if(str.equals("do")) {
+				if(str.equals("DO")) {
 					kind = Kind.KW_DO;
 				}
-				else if(str.equals("end")) {
+				else if(str.equals("END")) {
 					kind = Kind.KW_END;
 				}
-				else if(str.equals("let")) {
+				else if(str.equals("LET")) {
 					kind = Kind.KW_LET;
 				}
-				else if(str.equals("switch")) {
+				else if(str.equals("SWITCH")) {
 					kind = Kind.KW_SWITCH;
 				}
-				else if(str.equals("case")) {
+				else if(str.equals("CASE")) {
 					kind = Kind.KW_CASE;
 				}
-				else if(str.equals("default")) {
+				else if(str.equals("DEFAULT")) {
 					kind = Kind.KW_DEFAULT;
 				}
-				else if(str.equals("if")) {
+				else if(str.equals("IF")) {
 					kind = Kind.KW_IF;
 				}
-				else if(str.equals("else")) {
+				else if(str.equals("ELSE")) {
 					kind = Kind.KW_ELSE;
 				}
-				else if(str.equals("while")) {
+				else if(str.equals("WHILE")) {
 					kind = Kind.KW_WHILE;
 				}
-				else if(str.equals("return")) {
+				else if(str.equals("RETURN")) {
 					kind = Kind.KW_RETURN;
 				}
-				else if(str.equals("list")) {
+				else if(str.equals("LIST")) {
 					kind = Kind.KW_LIST;
 				}
-				else if(str.equals("var")) {
+				else if(str.equals("VAR")) {
 					kind = Kind.KW_VAR;
 				}
-				else if(str.equals("val")) {
+				else if(str.equals("VAL")) {
 					kind = Kind.KW_VAL;
 				}
-				else if(str.equals("nil")) {
+				else if(str.equals("NIL")) {
 					kind = Kind.KW_NIL;
 				}
-				else if(str.equals("true")) {
+				else if(str.equals("TRUE")) {
 					kind = Kind.KW_TRUE;
 				}
-				else if(str.equals("false")) {
+				else if(str.equals("FALSE")) {
 					kind = Kind.KW_FALSE;
 				}
-				else if(str.equals("int")) {
+				else if(str.equals("INT")) {
 					kind = Kind.KW_INT;
 				}
-				else if(str.equals("String")) {
+				else if(str.equals("STRING")) {
 					kind = Kind.KW_STRING;
 				}
-				else if(str.equals("float")) {
+				else if(str.equals("FLOAT")) {
 					kind = Kind.KW_FLOAT;
 				}
-				else if(str.equals("boolean")) {
+				else if(str.equals("BOOLEAN")) {
 					kind = Kind.KW_BOOLEAN;
 				}
 				else {
