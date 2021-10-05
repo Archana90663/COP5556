@@ -166,6 +166,7 @@ public class Parser implements IPLPParser{
 		List<IDeclaration> declarationList = new ArrayList<>();
 		List<IStatement> statementList = new ArrayList<>();
 		
+		if(this.token.getKind() == Kind.KW_DO) {
 		try {
 			nextOne();
 			while(declarations.contains(this.token.getKind()) || statements.contains(this.token.getKind())) {
@@ -182,10 +183,14 @@ public class Parser implements IPLPParser{
 					throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
 				}
 			}
+			equal(Kind.KW_END);
 			b = new Block__(first.getLine(), first.getCharPositionInLine(), first.getText(), statementList);
 		} catch(SyntaxException e) {
 			throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
-
+			}
+		}
+		else {
+			throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
 		}
 		return b;
 		
@@ -206,6 +211,7 @@ public class Parser implements IPLPParser{
 		else {
 			throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
 		}
+		
 		return d;
 	}
 	
