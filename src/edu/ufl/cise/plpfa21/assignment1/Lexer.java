@@ -52,8 +52,17 @@ public class Lexer implements IPLPLexer {
 							start_line = position+1;
 							position = position+1;
 							break;
+						case '\"':
+							startLineArray.add(start_line);
+							start_line = position+1;
+							position = position+1;
+							break;
 						case ';':
 							tokensList.add(new Token(Kind.SEMI, start, newLength));
+							position = position+1;
+							break;
+						case ':':
+							tokensList.add(new Token(Kind.COLON, start, newLength));
 							position = position+1;
 							break;
 						case ',':
@@ -84,10 +93,10 @@ public class Lexer implements IPLPLexer {
 							tokensList.add(new Token(Kind.GT, start, newLength));
 							position = position+1;
 							break;
-						case '0':
-							tokensList.add(new Token(Kind.INT_LITERAL, start, newLength));
-							position = position+1;
-							break;
+//						case '0':
+//							tokensList.add(new Token(Kind.INT_LITERAL, start, newLength));
+//							position = position+1;
+//							break;
 						case '&':
 							tokensList.add(new Token(Kind.AND, start, newLength));
 							position = position+1;
@@ -218,6 +227,9 @@ public class Lexer implements IPLPLexer {
 							if(str.equals("DO")) {
 								kind = Kind.KW_DO;
 							}
+							else if(str.equals("FUN")) {
+								kind = Kind.KW_FUN;
+							}
 							else if(str.equals("END")) {
 								kind = Kind.KW_END;
 							}
@@ -332,6 +344,9 @@ public class Lexer implements IPLPLexer {
 				if(str.equals("DO")) {
 					kind = Kind.KW_DO;
 				}
+				else if(str.equals("FUN")) {
+					kind = Kind.KW_FUN;
+				}
 				else if(str.equals("END")) {
 					kind = Kind.KW_END;
 				}
@@ -417,6 +432,13 @@ public class Lexer implements IPLPLexer {
 				// TODO Auto-generated catch block
 				throw new LexicalException("Invalid token", 0, 0);
 			}
+			
+//			System.out.println(t.getKind());
+//			for(int i=0; i<tokensList.size(); i++) {
+//				System.out.println("Token items: " + tokensList.get(i).getKind());
+//			}
+//			System.out.println("\n");
+			System.out.println(t.kind);
 			numberOfTokens++;
 			return t;
 		
