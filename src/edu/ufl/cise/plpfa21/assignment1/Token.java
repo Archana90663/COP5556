@@ -65,7 +65,7 @@ public class Token implements IPLPToken{
 		 * 
 		 * @return  The position of the first character of this token in the line.  Counting starts at 0.
 		 */
-		return this.currentPosition - Lexer.startLineArray.get(this.getLine()-1);
+		return this.currentPosition - Lexer.startLineArray.get(Math.abs(this.getLine()-1));
 	}
 
 	@Override

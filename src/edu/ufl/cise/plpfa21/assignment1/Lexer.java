@@ -438,7 +438,7 @@ public class Lexer implements IPLPLexer {
 //				System.out.println("Token items: " + tokensList.get(i).getKind());
 //			}
 //			System.out.println("\n");
-			System.out.println(t.kind);
+//			System.out.println(t.kind);
 			numberOfTokens++;
 			return t;
 		
