@@ -66,68 +66,58 @@ public class Parser implements IPLPParser{
 	
 	public IExpression expr() throws SyntaxException{
 		IPLPToken first = this.token;
-		IExpression ex;
-		IExpression ex2;
-		IExpression ex3;
-		
-		try {
-			ex2 = trm();
+		IExpression ex = null;
+		IExpression ex1 = null;
+		ex = trm();
 			while(this.token.getKind() == Kind.LT || this.token.getKind() == Kind.GT || this.token.getKind() == Kind.EQUALS || this.token.getKind() == Kind.NOT_EQUALS) {
 				IPLPToken t = this.token;
-				nextOne();
-				ex3 = trm();
-				//int line, int posInLine, String text, IExpression left, IExpression right, Kind op
-				ex2 = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex2, ex3, first.getKind());
+//				nextOne();
+				equal(Kind.LT);
+				equal(Kind.GT);
+				equal(Kind.EQUALS);
+				equal(Kind.NOT_EQUALS);
+				ex1 = trm();
+				ex = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex, ex1, t.getKind());
 			}
-			ex = ex2;
-			
-		} catch(SyntaxException e) {
-			throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
-
-		}
+			return ex;
+		} 
 		
-		return ex;
-	}
 	
 	IExpression trm() throws SyntaxException{
 		IPLPToken first = this.token;
-		IExpression ex;
+		IExpression ex = null;
+		IExpression ex1 = null;
+		ex = element();
 		
-		IExpression ex2;
-		IExpression ex3;
 		
-		try {
-			ex2 = element();
 			while(this.token.getKind() == Kind.PLUS || this.token.getKind() == Kind.MINUS || this.token.getKind() == Kind.OR) {
 				IPLPToken t = this.token;
-				nextOne();
-				ex3 = element();
-				ex2 = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex2, ex3, first.getKind());
+//				nextOne();
+				equal(Kind.PLUS);
+				equal(Kind.MINUS);
+				equal(Kind.OR);
+				ex1 = element();
+				ex = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex, ex1, t.getKind());
 			}
-			ex = ex2;
-		} catch(SyntaxException e) {
-			throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
-		}
-		return ex;
-	}
+			return ex;
+		} 
+		
+	
 	
 	public IExpression element() throws SyntaxException{
 		IPLPToken first = this.token;
-		IExpression ex;
-		IExpression ex2;
-		IExpression ex3;
-		try {
-			ex2 = factor();
-			while(this.token.getKind() == Kind.TIMES || this.token.getKind() == Kind.DIV || this.token.getKind() == Kind.AND) {
-				IPLPToken t = this.token;
-				nextOne();
-				ex3 = factor();
-				ex2 = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex2, ex3, first.getKind());
+		IExpression ex=null;
+		IExpression ex1=null;
+		ex = factor();
+				while(this.token.getKind() == Kind.TIMES || this.token.getKind() == Kind.DIV || this.token.getKind() == Kind.AND) {
+					IPLPToken t = this.token;
+					equal(Kind.TIMES);
+					equal(Kind.DIV);
+					equal(Kind.AND);
+					ex1 = factor();
+					ex = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex, ex1, t.getKind());
 			}
-			ex = ex2;
-		} catch(SyntaxException e) {
-			throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
-		}
+		
 		return ex;
 	}
 	
@@ -137,30 +127,26 @@ public class Parser implements IPLPParser{
 		Kind kind = this.token.getKind();
 		switch(kind) {
 			case IDENTIFIER:
-				nextOne();
 				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getStringValue(), first.getText());
-				ex = new IdentExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident);	
+//				System.out.println(first.getStringValue() + " " + first.getText());
+				ex = new IdentExpression__(first.getLine(), first.getCharPositionInLine(), this.token.getText(), ident);	
+				nextOne();
 				break;
 			case INT_LITERAL:
-				nextOne();
 				ex = new IntLiteralExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getIntValue());	
+				nextOne();
 				break;
 			case KW_TRUE:
 			case KW_FALSE:
-				nextOne();
 				ex = new BooleanLiteralExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), Boolean.parseBoolean(first.getStringValue()));
+				nextOne();
 				break;
 			case LPAREN:
-				try {
-					nextOne();
-					ex = expr();
-					equal(Kind.RPAREN);
-				} catch(SyntaxException e) {
-					throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
-
-				}
+				nextOne();
+				ex = expr();
+				equal(Kind.RPAREN);
 				break;				
-				
+			
 //				default:
 //					throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
 		}
@@ -210,8 +196,9 @@ public class Parser implements IPLPParser{
 		if(this.token.getKind() == Kind.KW_VAL) {
 			try {
 				nextOne();
+				first = this.token;
 				IExpression ex = expr();
-				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getStringValue());
+				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getText());
 				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), TypeKind.INT);
 				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
 				d = new ImmutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
@@ -224,8 +211,10 @@ public class Parser implements IPLPParser{
 		else if(this.token.getKind() == Kind.KW_VAR) {
 			try {
 				nextOne();
+				first = this.token;
+//				nextOne();
 				IExpression ex = expr();
-				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getStringValue());
+				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getText());
 				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), TypeKind.INT);
 				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
 				d = new MutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
@@ -236,9 +225,11 @@ public class Parser implements IPLPParser{
 		}
 		else if(this.token.getKind() == Kind.KW_INT) {
 			try {
+//				nextOne();
 				nextOne();
+				first = this.token;
 				IExpression ex = expr();
-				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getStringValue());
+				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getText());
 				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), TypeKind.INT);
 				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
 				d = new MutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
@@ -250,9 +241,11 @@ public class Parser implements IPLPParser{
 		
 		else if(this.token.getKind() == Kind.KW_BOOLEAN) {
 			try {
+//				nextOne();
 				nextOne();
+				first = this.token;
 				IExpression ex = expr();
-				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getStringValue());
+				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getText());
 				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), TypeKind.BOOLEAN);
 				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
 				d = new MutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
@@ -263,9 +256,11 @@ public class Parser implements IPLPParser{
 		}
 		else if(this.token.getKind() == Kind.KW_STRING) {
 			try {
+//				nextOne();
 				nextOne();
+				first = this.token;
 				IExpression ex = expr();
-				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getStringValue());
+				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getText());
 				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), TypeKind.STRING);
 				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
 				d = new ImmutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
@@ -323,7 +318,9 @@ public class Parser implements IPLPParser{
 				while(this.token.getKind() != Kind.EOF) {
 					nextOne();
 					dec = declarationMethod();
-					list.add(dec);
+					if(dec != null) {
+						list.add(dec);
+					}
 				}	
 			}
 			Block__ b = blck();
