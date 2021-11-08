@@ -181,7 +181,12 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitIIfStatement(IIfStatement n, Object arg) throws Exception {
 		//TODO
-		throw new UnsupportedOperationException("IMPLEMENT ME!");
+		if(n.getGuardExpression().visit(this, arg) != IType.TypeKind.BOOLEAN) {
+			throw new TypeCheckException("Incorrect Type");
+		}
+		n.getBlock().visit(this,null);
+		return null;
+//		throw new UnsupportedOperationException("IMPLEMENT ME!");
 	}
 
 	@Override
@@ -217,6 +222,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		if(!type.isKind(IType.TypeKind.INT)) {
 			throw new TypeCheckException("Let Statement kind is not Integer");
 		}
+		
 		// set declaration of LetStatement to "declaration"
 		
 		throw new UnsupportedOperationException("IMPLEMENT ME!");

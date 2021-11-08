@@ -109,6 +109,9 @@ public class SymbolTable {
 	 * @return
 	 */
 	public SymbolTableEntry lookupEntry(String name) {
+//		for(String k : entries.keySet()) {
+//			System.out.println(k);
+//		}
 		SymbolTableEntry entry = entries.get(name);
 		if (entry == null)
 			return null;
