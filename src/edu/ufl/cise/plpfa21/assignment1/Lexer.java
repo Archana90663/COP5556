@@ -288,7 +288,8 @@ public class Lexer implements IPLPLexer {
 								kind = Kind.KW_BOOLEAN;
 							}
 							else {
-								kind = Kind.IDENTIFIER;
+//								kind = Kind.IDENTIFIER;
+								kind = Kind.STRING_LITERAL;
 							}
 							tokensList.add(new Token(kind, start, position-start));
 //							t.currentPosition = start;

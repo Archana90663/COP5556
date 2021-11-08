@@ -87,7 +87,7 @@ public class Token implements IPLPToken{
 			}
 			return sb.toString();
 		}
-		return null;
+		return "";
 	}
 
 	@Override
