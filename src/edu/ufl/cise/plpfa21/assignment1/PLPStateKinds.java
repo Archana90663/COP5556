@@ -6,6 +6,7 @@ public interface PLPStateKinds {
 	static enum State{
 		start,
 		integer_literal,
+		string_literal,
 		not,
 		less_than,
 		greater_than,
@@ -15,7 +16,9 @@ public interface PLPStateKinds {
 		minus,
 		div,
 		comment,
-		close_comment
+		close_comment,
+		and,
+		string_start
 	}
 
 }
