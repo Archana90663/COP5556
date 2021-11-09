@@ -62,36 +62,39 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitIBinaryExpression(IBinaryExpression n, Object arg) throws Exception {
 		//TODO
-		TypeKind type = null;
+		IType type = null;
 		Type__ left = (Type__) n.getLeft().visit(this, arg);
 		Type__ right = (Type__) n.getRight().visit(this, arg);
-		if(left != right) {
-			throw new TypeCheckException("Left and Right types are not equal");
-		}
+//		}
+//		if(left != right) {
+//			throw new TypeCheckException("Left and Right types are not equal");
+//		}
+	if(left.isString() && right.isInt() || left.isInt() && right.isString() || left.isInt() && right.isInt()) {
 		Kind operation = n.getOp();
 		switch(operation) {
 			case EQUALS:
 			case NOT_EQUALS:
-				type = IType.TypeKind.BOOLEAN;
+				type = left;
 				break;
 			case GT:
 			case LT:
-				if(left.isKind(IType.TypeKind.INT)) {
-					type = IType.TypeKind.BOOLEAN;
+				if(left.isKind(IType.TypeKind.INT) || left.isKind(IType.TypeKind.STRING)) {
+					type =left;
 				}
 				break;
 			case AND:
 			case OR:
-				if(left.isKind(IType.TypeKind.INT) || left.isKind(IType.TypeKind.BOOLEAN)) {
+				if(left.isKind(IType.TypeKind.INT) || left.isKind(IType.TypeKind.BOOLEAN) || left.isKind(IType.TypeKind.STRING)) {
 					n.setType(left);
+					type = left;
 				}
 				break;
 			case DIV:
 			case MINUS:
 			case PLUS:
 			case TIMES:
-				if(left.isKind(IType.TypeKind.INT)) {
-					type = IType.TypeKind.INT;
+				if(left.isKind(IType.TypeKind.INT) || left.isKind(IType.TypeKind.STRING)) {
+					type = left;
 				}
 				break;
 			default:
@@ -104,6 +107,10 @@ public class TypeCheckVisitor implements ASTVisitor {
 		else {
 			throw new TypeCheckException("Returned null");
 		}
+	}
+	else {
+		throw new TypeCheckException("Returned null");
+	}
 //		throw new UnsupportedOperationException("IMPLEMENT ME!");
 	}
 
@@ -122,7 +129,9 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitIBooleanLiteralExpression(IBooleanLiteralExpression n, Object arg) throws Exception {
 		//TODO
-		return IType.TypeKind.BOOLEAN;
+		Type__ type = new PrimitiveType__(n.getLine(), n.getPosInLine(), n.getText(), IType.TypeKind.BOOLEAN);
+		n.setType(type);
+		return type;
 //		throw new UnsupportedOperationException("IMPLEMENT ME!");
 	}
 
@@ -222,10 +231,11 @@ public class TypeCheckVisitor implements ASTVisitor {
 		if(!type.isKind(IType.TypeKind.INT)) {
 			throw new TypeCheckException("Let Statement kind is not Integer");
 		}
+		return type;
 		
 		// set declaration of LetStatement to "declaration"
 		
-		throw new UnsupportedOperationException("IMPLEMENT ME!");
+//		throw new UnsupportedOperationException("IMPLEMENT ME!");
 	}
 
 	@Override
@@ -316,7 +326,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 			if(!(declarationType.isKind(IType.TypeKind.INT) && declarationType.isKind(IType.TypeKind.BOOLEAN))) {
 				throw new TypeCheckException("Return type is incorrect");
 			}
-			return null;
+			return declarationType;
 		}
 		else {
 			throw new TypeCheckException("Return statement is not valid");
@@ -360,7 +370,8 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitISwitchStatement(ISwitchStatement n, Object arg) throws Exception {
 		//TODO
-		throw new UnsupportedOperationException("IMPLEMENT ME!");
+		throw new TypeCheckException("Returned null");
+//		throw new UnsupportedOperationException("IMPLEMENT ME!");
 	}
 
 	@Override
