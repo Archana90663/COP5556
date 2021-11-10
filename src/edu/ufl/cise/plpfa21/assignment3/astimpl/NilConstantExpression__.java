@@ -11,7 +11,7 @@ public class NilConstantExpression__ extends Expression__ implements INilConstan
 
 	@Override
 	public Object visit(ASTVisitor v, Object arg) throws Exception {
-		return v.visitINilConstantExpression(null, arg);
+		return v.visitINilConstantExpression(this, arg);
 	}
 
 	@Override

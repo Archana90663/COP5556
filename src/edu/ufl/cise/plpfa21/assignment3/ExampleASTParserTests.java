@@ -347,7 +347,8 @@ class ExampleASTParserTests implements PLPTokenKinds {
 		assertEquals(n13.getType(), TypeKind.INT);
 	}
 	
-	@Test public void test10() throws Exception{
+	@Test 
+	public void test10() throws Exception{
 		String input = """
 		VAR A;
 		VAL B=0;

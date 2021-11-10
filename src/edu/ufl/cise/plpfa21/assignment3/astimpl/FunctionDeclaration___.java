@@ -45,6 +45,11 @@ public class FunctionDeclaration___ extends Declaration__ implements IFunctionDe
 		return "FunctionDeclaration___ [args=" + args + ", block=" + block + ", name=" + name + ", resultType="
 				+ resultType + "]";
 	}
+	@Override
+	public void setType(IType type) {
+		resultType = type;
+		
+	}
 	
 	
 
