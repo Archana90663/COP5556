@@ -267,7 +267,7 @@ public class Parser implements IPLPParser{
 				if(first.getKind() == Kind.KW_INT) {
 					type = IType.TypeKind.INT;
 				}
-				if(first.getKind() == Kind.KW_BOOLEAN || this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE) {
+				if(first.getKind() == Kind.KW_BOOLEAN || first.getKind() == Kind.KW_TRUE || first.getKind() == Kind.KW_FALSE) {
 					type = IType.TypeKind.BOOLEAN;
 				}
 				if(first.getKind() == Kind.KW_LIST) {
