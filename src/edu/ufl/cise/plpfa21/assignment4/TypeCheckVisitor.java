@@ -66,10 +66,10 @@ public class TypeCheckVisitor implements ASTVisitor {
 		Type__ left = (Type__) n.getLeft().visit(this, arg);
 		Type__ right = (Type__) n.getRight().visit(this, arg);
 //		}
-//		if(left != right) {
+		if(left == right) {
 //			throw new TypeCheckException("Left and Right types are not equal");
 //		}
-	if(left.isString() && right.isInt() || left.isInt() && right.isString() || left.isInt() && right.isInt()) {
+//	if(left.isString() && right.isInt() || left.isInt() && right.isString() || left.isInt() && right.isInt()) {
 		Kind operation = n.getOp();
 		switch(operation) {
 			case EQUALS:
@@ -109,7 +109,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		}
 	}
 	else {
-		throw new TypeCheckException("Returned null");
+		throw new TypeCheckException("Types are incorrect");
 	}
 //		throw new UnsupportedOperationException("IMPLEMENT ME!");
 	}
