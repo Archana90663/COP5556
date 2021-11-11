@@ -52,8 +52,17 @@ public class Lexer implements IPLPLexer {
 							start_line = position+1;
 							position = position+1;
 							break;
+						case '\"':
+							startLineArray.add(start_line);
+							start_line = position+1;
+							position = position+1;
+							break;
 						case ';':
 							tokensList.add(new Token(Kind.SEMI, start, newLength));
+							position = position+1;
+							break;
+						case ':':
+							tokensList.add(new Token(Kind.COLON, start, newLength));
 							position = position+1;
 							break;
 						case ',':
@@ -84,14 +93,22 @@ public class Lexer implements IPLPLexer {
 							tokensList.add(new Token(Kind.GT, start, newLength));
 							position = position+1;
 							break;
-						case '0':
-							tokensList.add(new Token(Kind.INT_LITERAL, start, newLength));
-							position = position+1;
-							break;
+//						case '0':
+//							tokensList.add(new Token(Kind.INT_LITERAL, start, newLength));
+//							position = position+1;
+//							break;
+//						case '&':
+//							tokensList.add(new Token(Kind.AND, start, newLength));
+//							position = position+1;
+//							break;
 						case '&':
-							tokensList.add(new Token(Kind.AND, start, newLength));
+							state = State.and;
 							position = position+1;
 							break;
+//						case '\"':
+//							state = State.string_start;
+//							position = position+1;
+//							break;
 						case '=':
 							state = State.equal_sign;
 							position = position+1;
@@ -112,8 +129,12 @@ public class Lexer implements IPLPLexer {
 							tokensList.add(new Token(Kind.PLUS, start, newLength));
 							position = position+1;
 							break;
+//						case '|':
+//							tokensList.add(new Token(Kind.OR, start, newLength));
+//							position = position+1;
+//							break;
 						case '|':
-							tokensList.add(new Token(Kind.OR, start, newLength));
+							state = State.or;
 							position = position+1;
 							break;
 						case '!':
@@ -164,6 +185,34 @@ public class Lexer implements IPLPLexer {
 							position = position+1;
 						}					
 						break;
+					case string_start:
+						if(c == '\"') {
+							position = position+1;
+							tokensList.add(new Token(Kind.STRING_LITERAL, start, position-start));
+							state = State.start;
+						}
+						else if(Character.isJavaIdentifierPart(c)){
+							state = State.string_literal;
+							position = position+1;
+						}
+						else {
+							state = State.start;
+						}
+						break;
+					case and:
+						if(c == '&') {
+							position = position+1;
+							tokensList.add(new Token(Kind.AND, start, newLength+1));
+							state = State.start;
+						}
+						break;
+					case or:
+						if(c == '|') {
+							position = position+1;
+							tokensList.add(new Token(Kind.OR, start, newLength+1));
+							state = State.start;
+						}
+						break;
 					case equal_sign:
 						if(c == '=') {
 							position = position+1;
@@ -211,72 +260,87 @@ public class Lexer implements IPLPLexer {
 						}
 						position = position+1;
 						break;
+					case string_literal:
+						if(!Character.isJavaIdentifierPart(c)) {
+							String str = globalInput.substring(start, position);
+							tokensList.add(new Token(Kind.STRING_LITERAL, start, position-start));
+							state = State.start;
+						}
+						else {
+							position = position+1;
+						}
+						break;
+						
 					case identity:
 						if(!Character.isJavaIdentifierPart(c)) {
 							String str = globalInput.substring(start, position);
 							Kind kind;
-							if(str.equals("do")) {
+							if(str.equals("DO")) {
 								kind = Kind.KW_DO;
 							}
-							else if(str.equals("end")) {
+							else if(str.equals("FUN")) {
+								kind = Kind.KW_FUN;
+							}
+							else if(str.equals("END")) {
 								kind = Kind.KW_END;
 							}
-							else if(str.equals("let")) {
+							else if(str.equals("LET")) {
 								kind = Kind.KW_LET;
 							}
-							else if(str.equals("switch")) {
+							else if(str.equals("SWITCH")) {
 								kind = Kind.KW_SWITCH;
 							}
-							else if(str.equals("case")) {
+							else if(str.equals("CASE")) {
 								kind = Kind.KW_CASE;
 							}
-							else if(str.equals("default")) {
+							else if(str.equals("DEFAULT")) {
 								kind = Kind.KW_DEFAULT;
 							}
-							else if(str.equals("if")) {
+							else if(str.equals("IF")) {
 								kind = Kind.KW_IF;
 							}
-							else if(str.equals("else")) {
+							else if(str.equals("ELSE")) {
 								kind = Kind.KW_ELSE;
 							}
-							else if(str.equals("while")) {
+							else if(str.equals("WHILE")) {
 								kind = Kind.KW_WHILE;
 							}
-							else if(str.equals("return")) {
+							else if(str.equals("RETURN")) {
 								kind = Kind.KW_RETURN;
 							}
-							else if(str.equals("list")) {
+							else if(str.equals("LIST")) {
 								kind = Kind.KW_LIST;
 							}
-							else if(str.equals("var")) {
+							else if(str.equals("VAR")) {
 								kind = Kind.KW_VAR;
 							}
-							else if(str.equals("val")) {
+							else if(str.equals("VAL")) {
 								kind = Kind.KW_VAL;
 							}
-							else if(str.equals("nil")) {
+							else if(str.equals("NIL")) {
 								kind = Kind.KW_NIL;
 							}
-							else if(str.equals("true")) {
+							else if(str.equals("TRUE")) {
 								kind = Kind.KW_TRUE;
 							}
-							else if(str.equals("false")) {
+							else if(str.equals("FALSE")) {
 								kind = Kind.KW_FALSE;
 							}
-							else if(str.equals("int")) {
+							else if(str.equals("INT")) {
 								kind = Kind.KW_INT;
 							}
-							else if(str.equals("String")) {
+							else if(str.equals("STRING")) {
 								kind = Kind.KW_STRING;
 							}
-							else if(str.equals("float")) {
+							else if(str.equals("FLOAT")) {
 								kind = Kind.KW_FLOAT;
 							}
-							else if(str.equals("boolean")) {
+							else if(str.equals("BOOLEAN")) {
 								kind = Kind.KW_BOOLEAN;
 							}
 							else {
-								kind = Kind.IDENTIFIER;
+//								kind = Kind.IDENTIFIER;
+								kind = Kind.STRING_LITERAL;
 							}
 							tokensList.add(new Token(kind, start, position-start));
 //							t.currentPosition = start;
@@ -327,66 +391,69 @@ public class Lexer implements IPLPLexer {
 				tokensList.add(new Token(Kind.EOF, position, newLength-1));
 				break;
 			case identity:
-				String str = globalInput.substring(start, position);
+				String str = globalInput.substring(start, position-start);
 				Kind kind;
-				if(str.equals("do")) {
+				if(str.equals("DO")) {
 					kind = Kind.KW_DO;
 				}
-				else if(str.equals("end")) {
+				else if(str.equals("FUN")) {
+					kind = Kind.KW_FUN;
+				}
+				else if(str.equals("END")) {
 					kind = Kind.KW_END;
 				}
-				else if(str.equals("let")) {
+				else if(str.equals("LET")) {
 					kind = Kind.KW_LET;
 				}
-				else if(str.equals("switch")) {
+				else if(str.equals("SWITCH")) {
 					kind = Kind.KW_SWITCH;
 				}
-				else if(str.equals("case")) {
+				else if(str.equals("CASE")) {
 					kind = Kind.KW_CASE;
 				}
-				else if(str.equals("default")) {
+				else if(str.equals("DEFAULT")) {
 					kind = Kind.KW_DEFAULT;
 				}
-				else if(str.equals("if")) {
+				else if(str.equals("IF")) {
 					kind = Kind.KW_IF;
 				}
-				else if(str.equals("else")) {
+				else if(str.equals("ELSE")) {
 					kind = Kind.KW_ELSE;
 				}
-				else if(str.equals("while")) {
+				else if(str.equals("WHILE")) {
 					kind = Kind.KW_WHILE;
 				}
-				else if(str.equals("return")) {
+				else if(str.equals("RETURN")) {
 					kind = Kind.KW_RETURN;
 				}
-				else if(str.equals("list")) {
+				else if(str.equals("LIST")) {
 					kind = Kind.KW_LIST;
 				}
-				else if(str.equals("var")) {
+				else if(str.equals("VAR")) {
 					kind = Kind.KW_VAR;
 				}
-				else if(str.equals("val")) {
+				else if(str.equals("VAL")) {
 					kind = Kind.KW_VAL;
 				}
-				else if(str.equals("nil")) {
+				else if(str.equals("NIL")) {
 					kind = Kind.KW_NIL;
 				}
-				else if(str.equals("true")) {
+				else if(str.equals("TRUE")) {
 					kind = Kind.KW_TRUE;
 				}
-				else if(str.equals("false")) {
+				else if(str.equals("FALSE")) {
 					kind = Kind.KW_FALSE;
 				}
-				else if(str.equals("int")) {
+				else if(str.equals("INT")) {
 					kind = Kind.KW_INT;
 				}
-				else if(str.equals("String")) {
+				else if(str.equals("STRING")) {
 					kind = Kind.KW_STRING;
 				}
-				else if(str.equals("float")) {
+				else if(str.equals("FLOAT")) {
 					kind = Kind.KW_FLOAT;
 				}
-				else if(str.equals("boolean")) {
+				else if(str.equals("BOOLEAN")) {
 					kind = Kind.KW_BOOLEAN;
 				}
 				else {
@@ -417,6 +484,13 @@ public class Lexer implements IPLPLexer {
 				// TODO Auto-generated catch block
 				throw new LexicalException("Invalid token", 0, 0);
 			}
+			
+//			System.out.println(t.getKind());
+//			for(int i=0; i<tokensList.size(); i++) {
+//				System.out.println("Token items: " + tokensList.get(i).getKind());
+//			}
+//			System.out.println("\n");
+//			System.out.println(t.kind);
 			numberOfTokens++;
 			return t;
 		
