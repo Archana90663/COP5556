@@ -4,6 +4,7 @@ import edu.ufl.cise.plpfa21.assignment3.ast.ASTVisitor;
 import edu.ufl.cise.plpfa21.assignment3.ast.IExpression;
 import edu.ufl.cise.plpfa21.assignment3.ast.IMutableGlobal;
 import edu.ufl.cise.plpfa21.assignment3.ast.INameDef;
+import edu.ufl.cise.plpfa21.assignment3.ast.IType;
 
 public class MutableGlobal__ extends Declaration__ implements IMutableGlobal {
 
@@ -38,6 +39,9 @@ public class MutableGlobal__ extends Declaration__ implements IMutableGlobal {
 	}
 
 
-	
+	@Override
+	public void setType(IType type) {
+		varDef.setType(type);		
+	}
 	
 }

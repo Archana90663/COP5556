@@ -28,7 +28,7 @@ public class ListSelectorExpression__ extends Expression__ implements IListSelec
 	}
 	@Override
 	public String toString() {
-		return "ListSelectorExpression__ [name=" + name + ", index=" + index + "]";
+		return "ListSelectorExpression__ [name=" + name + ", index=" + index + ", type=" + type + "]";
 	}
 	
 	

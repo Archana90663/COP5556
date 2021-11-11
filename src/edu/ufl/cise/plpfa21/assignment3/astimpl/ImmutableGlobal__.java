@@ -4,6 +4,7 @@ import edu.ufl.cise.plpfa21.assignment3.ast.ASTVisitor;
 import edu.ufl.cise.plpfa21.assignment3.ast.IExpression;
 import edu.ufl.cise.plpfa21.assignment3.ast.IImmutableGlobal;
 import edu.ufl.cise.plpfa21.assignment3.ast.INameDef;
+import edu.ufl.cise.plpfa21.assignment3.ast.IType;
 
 public class ImmutableGlobal__ extends Declaration__ implements IImmutableGlobal {
 	
@@ -35,6 +36,12 @@ public class ImmutableGlobal__ extends Declaration__ implements IImmutableGlobal
 	public String toString() {
 		return "ImmutableGlobal__ [nameDef=" + nameDef + ", expression=" + expression + "]";
 	}
+
+	@Override
+	public void setType(IType type) {
+		nameDef.setType(type);
+	}
+	
 	
 	
 
