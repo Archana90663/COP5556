@@ -302,7 +302,17 @@ public class StarterCodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitIIdentifier(IIdentifier n, Object arg) throws Exception {
-		throw new UnsupportedOperationException("TO IMPLEMENT");
+//		throw new UnsupportedOperationException("TO IMPLEMENT");
+		IDeclaration dec = n.getDec();
+		MethodVisitor mv = ((MethodVisitorLocalVarTable)arg).mv;
+		IType type = TypeCheckVisitor.getType(dec);
+		if(type.isInt() || type.isBoolean()) {
+			mv.visitVarInsn(ISTORE, dec.getLine());
+		}
+		else {
+			mv.visitVarInsn(ASTORE, dec.getLine());
+		}
+		return null;
 	}
 
 	@Override
@@ -347,7 +357,23 @@ public class StarterCodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitILetStatement(ILetStatement n, Object arg) throws Exception {
-		throw new UnsupportedOperationException("TO IMPLEMENT");
+//		throw new UnsupportedOperationException("TO IMPLEMENT");
+		MethodVisitor mv = ((MethodVisitorLocalVarTable)arg).mv;
+		String s_type = "I";
+		IType type = n.getExpression().getType();
+		if(type.isInt()) {
+			s_type = "I";
+			cw.visitField(ACC_STATIC, n.getText(), "I", null, null);
+		}
+		else if(type.isBoolean()) {
+			s_type = "Z";
+			cw.visitField(ACC_STATIC, n.getText(), "Z", null, null);
+		}
+		if(n.getExpression()!= null) {
+			n.getExpression().visit(this, arg);
+			mv.visitFieldInsn(PUTSTATIC, className, n.getText(), s_type, null, null);
+		}
+		return null;
 	}
 		
 
