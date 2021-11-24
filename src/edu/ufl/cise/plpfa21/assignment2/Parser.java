@@ -131,10 +131,12 @@ public class Parser implements IPLPParser{
 				nextOne();
 				break;
 			case IDENTIFIER:
-				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getStringValue(), first.getText());
+//				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getStringValue());
 //				System.out.println(first.getStringValue() + " " + first.getText());
-				ex = new IdentExpression__(first.getLine(), first.getCharPositionInLine(), this.token.getText(), ident);	
-				nextOne();
+//				ex = new IdentExpression__(first.getLine(), first.getCharPositionInLine(), this.token.getText(), ident);
+//				ex = new IdentExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident);	
+				ex = new StringLiteralExpression__(first.getLine(), first.getCharPositionInLine(), first.getStringValue(), first.getText());
+//				nextOne();
 				break;
 			case INT_LITERAL:
 				ex = new IntLiteralExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getIntValue());	
@@ -142,11 +144,11 @@ public class Parser implements IPLPParser{
 				break;
 			case KW_TRUE:
 				ex = new BooleanLiteralExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), Boolean.parseBoolean(first.getText()));
-				nextOne();
+//				nextOne();
 				break;
 			case KW_FALSE:
 				ex = new BooleanLiteralExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), Boolean.parseBoolean(first.getStringValue()));
-				nextOne();
+//				nextOne();
 				break;
 			case LPAREN:
 				nextOne();
@@ -195,6 +197,10 @@ public class Parser implements IPLPParser{
 				ex = expr();
 				break;
 			case OR:
+				nextOne();
+				ex = expr();
+				break;
+			case ASSIGN:
 				nextOne();
 				ex = expr();
 				break;
@@ -247,93 +253,136 @@ public class Parser implements IPLPParser{
 		IPLPToken t = this.token;
 		IDeclaration d = null;
 		if(this.token.getKind() == Kind.KW_VAL) {
-			try {
-				nextOne();
+			nextOne();
+			IExpression ex = null;
+			if(this.token.getKind() == Kind.IDENTIFIER) {
 				first = this.token;
-				while(this.token.getKind() != Kind.KW_INT && this.token.getKind() != Kind.KW_STRING && this.token.getKind() != Kind.KW_BOOLEAN && this.token.getKind() != Kind.KW_LIST) {
-					if(this.token.getKind() == Kind.EOF) {
-						return null;
-					}
+				nextOne();
+				if(this.token.getKind() == Kind.ASSIGN) {
+//					t= this.token;
 					nextOne();
-				}
-				t = this.token;
-				while(this.token.getKind() != Kind.IDENTIFIER && this.token.getKind() != Kind.INT_LITERAL && this.token.getKind() != Kind.STRING_LITERAL && this.token.getKind() != Kind.KW_TRUE && this.token.getKind() != Kind.KW_FALSE && this.token.getKind() != Kind.EOF) {
-					if(this.token.getKind() == Kind.EOF) {
-						return null;
+					if(this.token.getKind() == Kind.KW_INT || this.token.getKind() == Kind.KW_BOOLEAN || this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE || this.token.getKind() == Kind.INT_LITERAL || this.token.getKind() == Kind.KW_STRING || this.token.getKind() == Kind.IDENTIFIER) {
+//						nextOne();
+						t = this.token;
+						ex = expr();
 					}
+				}
+				else {
 					nextOne();
+					if(this.token.getKind() == Kind.KW_INT || this.token.getKind() == Kind.KW_BOOLEAN || this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE || this.token.getKind() == Kind.INT_LITERAL || this.token.getKind() == Kind.KW_STRING || this.token.getKind() == Kind.IDENTIFIER) {
+						t = this.token;
+						nextOne();
+						if(this.token.getKind() == Kind.ASSIGN) {
+							ex = expr();
+						}
+					}
 				}
-				TypeKind type = IType.TypeKind.STRING;
-				if(t.getKind() == Kind.KW_INT) {
-					type = IType.TypeKind.INT;
-				}
-				if(t.getKind() == Kind.KW_BOOLEAN || t.getKind() == Kind.KW_TRUE || t.getKind() == Kind.KW_FALSE) {
-					type = IType.TypeKind.BOOLEAN;
-				}
-				if(t.getKind() == Kind.KW_LIST) {
-					type = IType.TypeKind.LIST;
-				}
-				
-				IExpression ex = expr();
+			}
+			TypeKind type = IType.TypeKind.STRING;
+			if(t.getKind() == Kind.KW_INT || t.getKind() == Kind.INT_LITERAL) {
+				type = IType.TypeKind.INT;
+			}
+			if(t.getKind() == Kind.KW_BOOLEAN || t.getKind() == Kind.KW_TRUE || t.getKind() == Kind.KW_FALSE) {
+				type = IType.TypeKind.BOOLEAN;
+			}
+			if(t.getKind() == Kind.KW_LIST) {
+				type = IType.TypeKind.LIST;
+			}
+			Identifier__ ident = new Identifier__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), first.getText());
+			PrimitiveType__ tokenType = new PrimitiveType__(this.token.getLine(),this.token.getCharPositionInLine() , this.token.getText(), type);
+			NameDef__ nameDef = new NameDef__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), ident, tokenType);
+			d = new ImmutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
+
+//			try {
+//				nextOne();
+//				first = this.token;
+////				while(this.token.getKind() != Kind.KW_INT && this.token.getKind() != Kind.KW_STRING && this.token.getKind() != Kind.KW_BOOLEAN && this.token.getKind() != Kind.KW_LIST) {
+////					if(this.token.getKind() == Kind.EOF) {
+////						return null;
+////					}
+////					nextOne();
+////				}
+//				while(this.token.getKind() != Kind.IDENTIFIER) {
+//					nextOne();
+//				}
+//				nextOne();
+////				t = this.token;
+////				this.token.getKind() != Kind.IDENTIFIER && this.token.getKind() != Kind.INT_LITERAL && this.token.getKind() != Kind.STRING_LITERAL && this.token.getKind() != Kind.KW_TRUE && this.token.getKind() != Kind.KW_FALSE && 
+//				while(this.token.getKind() != Kind.EOF && this.token.getKind() != Kind.KW_INT && this.token.getKind() != Kind.KW_STRING && this.token.getKind() != Kind.KW_BOOLEAN && this.token.getKind() != Kind.IDENTIFIER && this.token.getKind() != Kind.INT_LITERAL && this.token.getKind() != Kind.STRING_LITERAL && this.token.getKind() != Kind.KW_TRUE && this.token.getKind() != Kind.KW_FALSE){
+////					if(this.token.getKind() == Kind.EOF) {
+////						return null;
+////					}
+//					nextOne();
+//				}
+//				t = this.token;
+//				TypeKind type = IType.TypeKind.STRING;
+//				if(t.getKind() == Kind.KW_INT || t.getKind() == Kind.INT_LITERAL) {
+//					type = IType.TypeKind.INT;
+//				}
+//				if(t.getKind() == Kind.KW_BOOLEAN || t.getKind() == Kind.KW_TRUE || t.getKind() == Kind.KW_FALSE) {
+//					type = IType.TypeKind.BOOLEAN;
+//				}
+//				if(t.getKind() == Kind.KW_LIST) {
+//					type = IType.TypeKind.LIST;
+//				}
+//				while(this.token.getKind() != Kind.EOF && this.token.getKind() != Kind.INT_LITERAL && this.token.getKind() != Kind.STRING_LITERAL && this.token.getKind() != Kind.KW_TRUE && this.token.getKind() != Kind.KW_FALSE) {
+//					nextOne();
+//				}
+//				IExpression ex = expr();
 //				Identifier__ ident = new Identifier__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), first.getText());
 //				PrimitiveType__ tokenType = new PrimitiveType__(this.token.getLine(),this.token.getCharPositionInLine() , this.token.getText(), type);
 //				NameDef__ nameDef = new NameDef__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), ident, tokenType);
-//				d = new ImmutableGlobal__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), nameDef, ex);
-				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getText());
-				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), type);
-				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
-				d = new ImmutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
-			} catch(SyntaxException e) {
-				throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
-
-			}
+////				d = new MutableGlobal__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), nameDef, ex);
+////				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getText());
+////				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), type);
+////				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
+//				d = new ImmutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
+//			} catch(SyntaxException e) {
+//				throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
+//
+//			}
 		}
 		else if(this.token.getKind() == Kind.KW_VAR) {
-			try {
-				nextOne();
-//				first = this.token;
-				while(this.token.getKind() != Kind.KW_INT && this.token.getKind() != Kind.KW_STRING && this.token.getKind() != Kind.KW_BOOLEAN && this.token.getKind() != Kind.KW_LIST) {
-					if(this.token.getKind() == Kind.EOF) {
-						return null;
-//						throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
-					}
-					nextOne();
-				}
-//				t = this.token;
+			nextOne();
+			IExpression ex = null;
+			if(this.token.getKind() == Kind.IDENTIFIER) {
 				first = this.token;
-				while(this.token.getKind() != Kind.IDENTIFIER && this.token.getKind() != Kind.INT_LITERAL && this.token.getKind() != Kind.STRING_LITERAL && this.token.getKind() != Kind.KW_TRUE && this.token.getKind() != Kind.KW_FALSE && this.token.getKind() != Kind.EOF) {
-					if(this.token.getKind() == Kind.EOF) {
-						return null;
-//						throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
-					}
+				nextOne();
+				if(this.token.getKind() == Kind.ASSIGN) {
+//					t= this.token;
 					nextOne();
+					if(this.token.getKind() == Kind.KW_INT || this.token.getKind() == Kind.KW_BOOLEAN || this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE || this.token.getKind() == Kind.INT_LITERAL || this.token.getKind() == Kind.KW_STRING || this.token.getKind() == Kind.IDENTIFIER) {
+//						nextOne();
+						t = this.token;
+						ex = expr();
+					}
 				}
-//				while(this.token.getKind() != Kind.INT_LITERAL && this.token.getKind() != Kind.IDENTIFIER) {
-//					nextOne();
-//				}
-				TypeKind type = IType.TypeKind.STRING;
-				if(this.token.getKind() == Kind.INT_LITERAL) {
-					type = IType.TypeKind.INT;
+				else {
+					nextOne();
+					if(this.token.getKind() == Kind.KW_INT || this.token.getKind() == Kind.KW_BOOLEAN || this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE || this.token.getKind() == Kind.INT_LITERAL || this.token.getKind() == Kind.KW_STRING || this.token.getKind() == Kind.IDENTIFIER) {
+						t = this.token;
+						nextOne();
+						if(this.token.getKind() == Kind.ASSIGN) {
+							ex = expr();
+						}
+					}
 				}
-				if(this.token.getKind() == Kind.KW_BOOLEAN || this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE) {
-					type = IType.TypeKind.BOOLEAN;
-				}
-				if(this.token.getKind() == Kind.KW_LIST) {
-					type = IType.TypeKind.LIST;
-				}
-				IExpression ex = expr();
-//				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getText());
-//				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), type);
-//				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
-//				d = new MutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
-				Identifier__ ident = new Identifier__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), first.getText());
-				PrimitiveType__ tokenType = new PrimitiveType__(this.token.getLine(),this.token.getCharPositionInLine() , this.token.getText(), type);
-				NameDef__ nameDef = new NameDef__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), ident, tokenType);
-				d = new MutableGlobal__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), nameDef, ex);
-			} catch(SyntaxException e) {
-				throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
-
 			}
+			TypeKind type = IType.TypeKind.STRING;
+			if(t.getKind() == Kind.KW_INT || t.getKind() == Kind.INT_LITERAL) {
+				type = IType.TypeKind.INT;
+			}
+			if(t.getKind() == Kind.KW_BOOLEAN || t.getKind() == Kind.KW_TRUE || t.getKind() == Kind.KW_FALSE) {
+				type = IType.TypeKind.BOOLEAN;
+			}
+			if(t.getKind() == Kind.KW_LIST) {
+				type = IType.TypeKind.LIST;
+			}
+			Identifier__ ident = new Identifier__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), first.getText());
+			PrimitiveType__ tokenType = new PrimitiveType__(this.token.getLine(),this.token.getCharPositionInLine() , this.token.getText(), type);
+			NameDef__ nameDef = new NameDef__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), ident, tokenType);
+			d = new ImmutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
+		}
 //			try {
 //				nextOne();
 //				first = this.token;
@@ -347,7 +396,6 @@ public class Parser implements IPLPParser{
 //			} catch(SyntaxException e) {
 //				throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
 //			}
-		}
 //		else if(this.token.getKind() == Kind.KW_INT) {
 //			try {
 //				nextOne();
@@ -391,32 +439,32 @@ public class Parser implements IPLPParser{
 //				throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
 //			}
 //		}
-		else if(this.token.getKind() == Kind.KW_FUN) {
-			IExpression e0 = null;
-			nextOne();
-			if(this.token.getKind() == Kind.LPAREN) {
-				nextOne();
-				e0 = expr();
-				equal(Kind.RPAREN);
-				TypeKind type = IType.TypeKind.STRING;
-				if(this.token.getKind() == Kind.KW_INT) {
-					type = IType.TypeKind.INT;
-				}
-				if(this.token.getKind() == Kind.KW_BOOLEAN || this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE) {
-					type = IType.TypeKind.BOOLEAN;
-				}
-				if(this.token.getKind() == Kind.KW_LIST) {
-					type = IType.TypeKind.LIST;
-				}
-				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getText());
-				List<INameDef> list = new ArrayList<>();
-				list.add(args());
-				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), type);
-				IBlock b = blck();
-				d = new FunctionDeclaration___(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, list, tokenType, b);
-//				d = new FunctionDeclaration___(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, list, tokenType, b);				
-			}
-		}
+//		else if(this.token.getKind() == Kind.KW_FUN) {
+//			IExpression e0 = null;
+//			nextOne();
+//			if(this.token.getKind() == Kind.LPAREN) {
+//				nextOne();
+//				e0 = expr();
+//				equal(Kind.RPAREN);
+//				TypeKind type = IType.TypeKind.STRING;
+//				if(this.token.getKind() == Kind.KW_INT) {
+//					type = IType.TypeKind.INT;
+//				}
+//				if(this.token.getKind() == Kind.KW_BOOLEAN || this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE) {
+//					type = IType.TypeKind.BOOLEAN;
+//				}
+//				if(this.token.getKind() == Kind.KW_LIST) {
+//					type = IType.TypeKind.LIST;
+//				}
+//				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getText());
+//				List<INameDef> list = new ArrayList<>();
+//				list.add(args());
+//				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), type);
+//				IBlock b = blck();
+//				d = new FunctionDeclaration___(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, list, tokenType, b);
+////				d = new FunctionDeclaration___(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, list, tokenType, b);				
+//			}
+//		}
 			
 //			try {
 //				nextOne();
@@ -532,86 +580,6 @@ public class Parser implements IPLPParser{
 		return elements;
 	}
 	
-	
-//	public IDeclaration prmDec() throws SyntaxException{
-//		IPLPToken first = this.token;
-//		IDeclaration d = null;
-//		if(this.token.getKind() == Kind.KW_VAL) {
-//			try {
-//				nextOne();
-//				IExpression ex = expr();
-//				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getStringValue());
-//				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), TypeKind.INT);
-//				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
-//				d = new ImmutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
-//				
-//			} catch(SyntaxException e) {
-//				throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
-//
-//			}
-//		}
-//		else if(this.token.getKind() == Kind.KW_VAR) {
-//			try {
-//				nextOne();
-//				IExpression ex = expr();
-//				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getStringValue());
-//				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), TypeKind.INT);
-//				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
-//				d = new MutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
-//				
-//			} catch(SyntaxException e) {
-//				throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
-//			}
-//		
-//		}
-//		
-//		else if(this.token.getKind() == Kind.KW_INT) {
-//			try {
-//				nextOne();
-//				IExpression ex = expr();
-//				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getStringValue());
-//				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), TypeKind.INT);
-//				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
-//				d = new MutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
-//				
-//			} catch(SyntaxException e) {
-//				throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
-//			}
-//		}
-//		
-//		else if(this.token.getKind() == Kind.KW_BOOLEAN) {
-//			try {
-//				nextOne();
-//				IExpression ex = expr();
-//				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getText(), first.getStringValue());
-//				PrimitiveType__ tokenType = new PrimitiveType__(first.getLine(),first.getCharPositionInLine() , first.getText(), TypeKind.BOOLEAN);
-//				NameDef__ nameDef = new NameDef__(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, tokenType);
-//				d = new MutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
-//				
-//			} catch(SyntaxException e) {
-//				throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
-//			}
-//		}
-////		else {
-////			throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
-////		}
-////		IPLPToken first = this.token;
-////		IDeclaration d;
-////		if(this.token.getKind()==Kind.KW_INT || this.token.getKind() == Kind.KW_BOOLEAN) {
-////			try {
-////				nextOne();
-////				IPLPToken i = equal(Kind.IDENTIFIER);
-////				d = new Declaration__(first.getLine(), first.getCharPositionInLine(), first.getText());
-////			} catch(SyntaxException e) {
-////				throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
-////			}
-////		}
-////		else {
-////			throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
-////		}
-////		
-//		return d;
-//	}
 	
 	public IStatement stmt() throws SyntaxException{
 		IPLPToken first = this.token;
