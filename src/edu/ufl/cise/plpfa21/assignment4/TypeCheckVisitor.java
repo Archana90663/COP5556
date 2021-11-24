@@ -11,6 +11,7 @@ import edu.ufl.cise.plpfa21.assignment3.ast.IBlock;
 import edu.ufl.cise.plpfa21.assignment3.ast.IBooleanLiteralExpression;
 import edu.ufl.cise.plpfa21.assignment3.ast.IDeclaration;
 import edu.ufl.cise.plpfa21.assignment3.ast.IExpression;
+import edu.ufl.cise.plpfa21.assignment3.ast.IExpressionStatement;
 import edu.ufl.cise.plpfa21.assignment3.ast.IFunctionCallExpression;
 import edu.ufl.cise.plpfa21.assignment3.ast.IFunctionDeclaration;
 import edu.ufl.cise.plpfa21.assignment3.ast.IIdentExpression;
@@ -66,7 +67,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		Type__ left = (Type__) n.getLeft().visit(this, arg);
 		Type__ right = (Type__) n.getRight().visit(this, arg);
 //		}
-		if(left == right) {
+//		if(left == right) {
 //			throw new TypeCheckException("Left and Right types are not equal");
 //		}
 //	if(left.isString() && right.isInt() || left.isInt() && right.isString() || left.isInt() && right.isInt()) {
@@ -108,11 +109,11 @@ public class TypeCheckVisitor implements ASTVisitor {
 			throw new TypeCheckException("Returned null");
 		}
 	}
-	else {
-		throw new TypeCheckException("Types are incorrect");
-	}
+//	else {
+//		throw new TypeCheckException("Types are incorrect");
+//	}
 //		throw new UnsupportedOperationException("IMPLEMENT ME!");
-	}
+	
 
 	/**
 	 * arg is enclosing function declaration
@@ -251,7 +252,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		return elementType;
 	}
 
-	IType getType(IDeclaration dec) {
+	public static IType getType(IDeclaration dec) {
 		if (dec == null) {
 			return null;
 		}
@@ -514,6 +515,12 @@ public class TypeCheckVisitor implements ASTVisitor {
 		IDeclaration dec = symtab.lookupDec(name);
 		check(dec != null, n, "identifier not declared");
 		return dec;
+	}
+
+	@Override
+	public Object visitIExpressionStatement(IExpressionStatement n, Object arg) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
