@@ -43,9 +43,11 @@ import edu.ufl.cise.plpfa21.assignment3.ast.IUnaryExpression;
 import edu.ufl.cise.plpfa21.assignment3.ast.IWhileStatement;
 import edu.ufl.cise.plpfa21.assignment3.astimpl.Type__;
 import edu.ufl.cise.plpfa21.assignment4.TypeCheckVisitor;
-import edu.ufl.cise.plpfa21.assignment5.ReferenceCodeGenVisitor.LocalVarInfo;
-import edu.ufl.cise.plpfa21.assignment5.ReferenceCodeGenVisitor.MethodVisitorLocalVarTable;
-import edu.ufl.cise.plpfa21.pLP.ListSelectorExpression;
+import edu.ufl.cise.plpfa21.assignment5.StarterCodeGenVisitor.LocalVarInfo;
+import edu.ufl.cise.plpfa21.assignment5.StarterCodeGenVisitor.MethodVisitorLocalVarTable;
+//import edu.ufl.cise.plpfa21.assignment5.ReferenceCodeGenVisitor.LocalVarInfo;
+//import edu.ufl.cise.plpfa21.assignment5.ReferenceCodeGenVisitor.MethodVisitorLocalVarTable;
+//import edu.ufl.cise.plpfa21.pLP.ListSelectorExpression;
 
 
 public class StarterCodeGenVisitor implements ASTVisitor, Opcodes {
@@ -71,7 +73,8 @@ public class StarterCodeGenVisitor implements ASTVisitor, Opcodes {
 	public static final String listDesc = "Ljava/util/ArrayList;";
 	public static final String runtimeClass = "edu/ufl/cise/plpfa21/assignment5/Runtime";
 	
-	
+	int slot=0;
+	int pslot=0;
 	
 	/* Records for information passed to children, namely the methodVisitor and information about current methods Local Variables */
 	record LocalVarInfo(String name, String typeDesc, Label start, Label end) {}
@@ -129,7 +132,7 @@ public class StarterCodeGenVisitor implements ASTVisitor, Opcodes {
 					break;
 				case EQUALS:
 					mv.visitJumpInsn(IF_ICMPEQ, exTrue);
-					mv.cisitLdcInsn(false);
+					mv.visitLdcInsn(false);
 					break;
 				case LT:
 					mv.visitJumpInsn(IF_ICMPLT, exTrue);
@@ -371,7 +374,7 @@ public class StarterCodeGenVisitor implements ASTVisitor, Opcodes {
 		}
 		if(n.getExpression()!= null) {
 			n.getExpression().visit(this, arg);
-			mv.visitFieldInsn(PUTSTATIC, className, n.getText(), s_type, null, null);
+			mv.visitFieldInsn(PUTSTATIC, className, n.getText(), s_type);
 		}
 		return null;
 	}
@@ -538,16 +541,39 @@ public class StarterCodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitIMutableGlobal(IMutableGlobal n, Object arg) throws Exception {
-		
-//		throw new UnsupportedOperationException("TO IMPLEMENT");
+		//		throw new UnsupportedOperationException("TO IMPLEMENT");
+//		MethodVisitor mv = ((MethodVisitorLocalVarTable)arg).mv;						
+//		FieldVisitor fv;
+//		fv = cw.visitField(ACC_PUBLIC, n.getExpression().getText(),  classDesc, null, null);
+//		fv.visitEnd();
+//		mv.visitVarInsn(AALOAD, 0);
+//		IType type = n.getExpression().getType();
+//		if(type.isBoolean()) {
+//			mv.visitVarInsn(AALOAD, 1);
+//			mv.visitLdcInsn(pslot);
+//			pslot++;
+//			mv.visitInsn(AALOAD);
+//			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "parseBoolean", "(Ljava/lang/String;)Z", false);
+//			
+//		}
+//		else if(type.isInt()) {
+//			mv.visitVarInsn(AALOAD, 1);
+//			mv.visitLdcInsn(pslot);
+//			pslot++;
+//			mv.visitInsn(AALOAD);
+//			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I", false);
+//		}
+//		mv.visitFieldInsn(PUTFIELD, className, n.getVarDef().getIdent().getText(), n.getExpression().getType().getDesc());
+//		return null;
 		MethodVisitor mv = ((MethodVisitorLocalVarTable)arg).mv;				
 		INameDef nameDef = n.getVarDef();
 		String varName = nameDef.getIdent().getName();
 		String typeDesc = nameDef.getType().getDesc();
-		FieldVisitor fieldVisitor = cw.visitField(ACC_PUBLIC | ACC_STATIC | ACC_FINAL, varName, typeDesc, null, null);
+		FieldVisitor fieldVisitor = cw.visitField(ACC_PUBLIC, varName, typeDesc, null, null);
 		fieldVisitor.visitEnd();
+		//generate code to initialize field.  
 		IExpression e = n.getExpression();
-		e.visit(this, arg); 
+		e.visit(this, arg);  //generate code to leave value of expression on top of stack
 		mv.visitFieldInsn(PUTFIELD, className, varName, typeDesc);	
 		return null;
 	}
