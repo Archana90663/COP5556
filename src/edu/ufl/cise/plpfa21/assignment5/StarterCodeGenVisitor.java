@@ -103,7 +103,8 @@ public class StarterCodeGenVisitor implements ASTVisitor, Opcodes {
 		MethodVisitor mv = ((MethodVisitorLocalVarTable) arg).mv();
 		Label exTrue = new Label();
 		Label exFalse = new Label();
-		if(n.getLeft().getType().isInt() && n.getRight().getType().isInt()) {
+//		if(n.getLeft().getType().isInt() && n.getRight().getType().isInt()) {
+		if((n.getLeft().getType().isInt() && n.getRight().getType().isInt())) {
 			n.getLeft().visit(this, arg);
 			n.getRight().visit(this, arg);
 			Kind kind = n.getOp();
@@ -388,7 +389,8 @@ public class StarterCodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitIListType(IListType n, Object arg) throws Exception {
-		throw new UnsupportedOperationException("SKIP THIS!!");
+//		throw new UnsupportedOperationException("SKIP THIS!!");
+		return null;
 	}
 
 	@Override
