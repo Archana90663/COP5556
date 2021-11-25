@@ -38,6 +38,8 @@ public class Parser implements IPLPParser{
 	HashSet<Kind> declarations = new HashSet<>();
 	HashSet<Kind> statements = new HashSet<>();
 	
+	HashMap<String, IExpression> map = new HashMap<>();
+	
 	
 	public Parser(IPLPLexer lexer) {
 		this.lexer = lexer;
@@ -102,12 +104,31 @@ public class Parser implements IPLPParser{
 				if(t.getKind() == Kind.PLUS) {
 					IExpression left = b.getLeft();
 					IExpression right = b.getRight();
-					b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), left.getText() + "+" + right.getText(), ex, ex1, t.getKind());
+					if(map.containsKey(left.getText()) && map.containsKey(right.getText())) {
+						left = map.get(left.getText());
+						right = map.get(right.getText());
+					}
+//					boolean leftDigit = Character.isDigit(map.get(left.getText()).getText().charAt(0));
+//					boolean rightDigit = Character.isDigit(map.get(right.getText()).getText().charAt(0));
+					boolean leftDigit = Character.isDigit(left.getText().charAt(0));
+					boolean rightDigit = Character.isDigit(right.getText().charAt(0));
+					if(leftDigit && rightDigit) {
+						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), Integer.toString(Integer.parseInt(left.getText()) + Integer.parseInt(right.getText())), left, right, Kind.PLUS);
+
+					}
+					else {
+					b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), map.get(left.getText()).getText() + map.get(right.getText()).getText(), ex, ex1, t.getKind());
 				}
+			}
 				else if(t.getKind() == Kind.MINUS) {
 					IExpression left = b.getLeft();
 					IExpression right = b.getRight();
 					b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), left.getText() + "-" + right.getText(), ex, ex1, t.getKind());
+				}
+				else if(t.getKind() == Kind.DIV) {
+					IExpression left = b.getLeft();
+					IExpression right = b.getRight();
+					b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), left.getText() + "/" + right.getText(), ex, ex1, t.getKind());
 				}
 				return b;
 			}
@@ -308,7 +329,7 @@ public class Parser implements IPLPParser{
 			PrimitiveType__ tokenType = new PrimitiveType__(this.token.getLine(),this.token.getCharPositionInLine() , this.token.getText(), type);
 			NameDef__ nameDef = new NameDef__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), ident, tokenType);
 			d = new ImmutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
-
+			
 //			try {
 //				nextOne();
 //				first = this.token;
@@ -385,19 +406,28 @@ public class Parser implements IPLPParser{
 				}
 			}
 			TypeKind type = IType.TypeKind.STRING;
-			if(t.getKind() == Kind.KW_INT || t.getKind() == Kind.INT_LITERAL) {
+			if(Character.isDigit(ex.getText().charAt(0))) {
 				type = IType.TypeKind.INT;
 			}
-			if(t.getKind() == Kind.KW_BOOLEAN || t.getKind() == Kind.KW_TRUE || t.getKind() == Kind.KW_FALSE) {
+			if(ex.getText().equals("TRUE") || ex.getText().equals("FALSE")) {
 				type = IType.TypeKind.BOOLEAN;
 			}
-			if(t.getKind() == Kind.KW_LIST) {
-				type = IType.TypeKind.LIST;
-			}
+//			if(t.getKind() == Kind.KW_INT || t.getKind() == Kind.INT_LITERAL) {
+//				type = IType.TypeKind.INT;
+//			}
+//			if(t.getKind() == Kind.KW_BOOLEAN || t.getKind() == Kind.KW_TRUE || t.getKind() == Kind.KW_FALSE) {
+//				type = IType.TypeKind.BOOLEAN;
+//			}
+//			if(t.getKind() == Kind.KW_LIST) {
+//				type = IType.TypeKind.LIST;
+//			}
+			
 			Identifier__ ident = new Identifier__(ex.getLine(), ex.getPosInLine(), ex.getText(), first.getText());
 			PrimitiveType__ tokenType = new PrimitiveType__(ex.getLine(),ex.getPosInLine() , ex.getText(), type);
 			NameDef__ nameDef = new NameDef__(ex.getLine(), ex.getPosInLine(), ex.getText(), ident, tokenType);
 			d = new ImmutableGlobal__(first.getLine(), first.getCharPositionInLine(), first.getText(), nameDef, ex);
+			map.put(first.getText(), ex);
+			
 //			Identifier__ ident = new Identifier__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), first.getText());
 //			PrimitiveType__ tokenType = new PrimitiveType__(this.token.getLine(),this.token.getCharPositionInLine() , this.token.getText(), type);
 //			NameDef__ nameDef = new NameDef__(this.token.getLine(), this.token.getCharPositionInLine(), this.token.getText(), ident, tokenType);
