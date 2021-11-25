@@ -70,6 +70,7 @@ public class Parser implements IPLPParser{
 		IPLPToken first = this.token;
 		IExpression ex = null;
 		IExpression ex1 = null;
+		BinaryExpression__ b = null;
 		ex = trm();
 			while(this.token.getKind() == Kind.LT || this.token.getKind() == Kind.GT || this.token.getKind() == Kind.EQUALS || this.token.getKind() == Kind.NOT_EQUALS) {
 				IPLPToken t = this.token;
@@ -79,7 +80,56 @@ public class Parser implements IPLPParser{
 //				equal(Kind.EQUALS);
 //				equal(Kind.NOT_EQUALS);
 				ex1 = trm();
-				ex = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex, ex1, t.getKind());
+				b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex, ex1, t.getKind());
+				if(t.getKind() == Kind.EQUALS) {
+					IExpression left = b.getLeft();
+					IExpression right = b.getRight();
+					if(map.containsKey(left.getText())) {
+						left = map.get(left.getText());
+					}
+					if(map.containsKey(right.getText())) {
+						right = map.get(right.getText());
+					}
+					
+					boolean leftDigit = (left.getText().equals("TRUE") || left.getText().equals("FALSE"));
+					boolean rightDigit = (right.getText().equals("TRUE") || right.getText().equals("FALSE"));
+					if(leftDigit && rightDigit) {
+						String s = Boolean.toString(left.getText().equals(right.getText()));
+						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), s, left, right, Kind.EQUALS);
+
+					}
+					else {
+						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), map.get(left.getText()).getText() + map.get(right.getText()).getText(), ex, ex1, t.getKind());
+					}
+				}
+				else if(t.getKind() == Kind.NOT_EQUALS) {
+					IExpression left = b.getLeft();
+					IExpression right = b.getRight();
+					if(map.containsKey(left.getText())) {
+						left = map.get(left.getText());
+					}
+					if(map.containsKey(right.getText())) {
+						right = map.get(right.getText());
+					}
+					
+					boolean leftDigit = (left.getText().equals("TRUE") || left.getText().equals("FALSE"));
+					boolean rightDigit = (right.getText().equals("TRUE") || right.getText().equals("FALSE"));
+					if(leftDigit && rightDigit) {
+						String s = "";
+						if(left.getText().equals(right.getText())) {
+							s = "false";
+						}
+						else {
+							s = "true";
+						}
+						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), s, left, right, Kind.NOT_EQUALS);
+
+					}
+					else {
+						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), map.get(left.getText()).getText() + map.get(right.getText()).getText(), ex, ex1, t.getKind());
+					}
+				}
+				return b;
 			}
 			return ex;
 		} 
@@ -177,11 +227,11 @@ public class Parser implements IPLPParser{
 				break;
 			case KW_TRUE:
 				ex = new BooleanLiteralExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), Boolean.parseBoolean(first.getText()));
-//				nextOne();
+				nextOne();
 				break;
 			case KW_FALSE:
-				ex = new BooleanLiteralExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), Boolean.parseBoolean(first.getStringValue()));
-//				nextOne();
+				ex = new BooleanLiteralExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), Boolean.parseBoolean(first.getText()));
+				nextOne();
 				break;
 			case KW_DO:
 				nextOne();
@@ -393,6 +443,12 @@ public class Parser implements IPLPParser{
 						t = this.token;
 						ex = expr();
 					}
+					else {
+						nextOne();
+						if(this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE) {
+							ex = expr();
+						}
+					}
 				}
 				else {
 					nextOne();
@@ -409,7 +465,7 @@ public class Parser implements IPLPParser{
 			if(Character.isDigit(ex.getText().charAt(0))) {
 				type = IType.TypeKind.INT;
 			}
-			if(ex.getText().equals("TRUE") || ex.getText().equals("FALSE")) {
+			if(ex.getText().equals("TRUE") || ex.getText().equals("FALSE") || ex.getText().equals("true") || ex.getText().equals("false")) {
 				type = IType.TypeKind.BOOLEAN;
 			}
 //			if(t.getKind() == Kind.KW_INT || t.getKind() == Kind.INT_LITERAL) {
