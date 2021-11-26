@@ -192,7 +192,7 @@ public class Parser implements IPLPParser{
 //					equal(Kind.DIV);
 //					equal(Kind.AND);
 					ex1 = factor();
-					ex = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex, ex1, t.getKind());
+//					ex = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex, ex1, t.getKind());
 					b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex, ex1, t.getKind());
 					if(t.getKind() == Kind.TIMES) {
 						IExpression left = b.getLeft();
@@ -212,8 +212,27 @@ public class Parser implements IPLPParser{
 						else {
 						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), map.get(left.getText()).getText() + map.get(right.getText()).getText(), ex, ex1, t.getKind());
 					}
-						return b;
 				}
+					else if(t.getKind() == Kind.AND) {
+						IExpression left = b.getLeft();
+						IExpression right = b.getRight();
+						if(map.containsKey(left.getText())) {
+							left = map.get(left.getText());
+						}
+						if(map.containsKey(right.getText())) {
+							right = map.get(right.getText());
+						}
+						String s = "";
+						if(left.getText().equals(right.getText())) {
+							s = "true";
+						}
+						else {
+							s = "false";
+						}
+						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), s, left, right, Kind.AND);
+						
+					}
+					return b;
 			}
 		
 		return ex;
