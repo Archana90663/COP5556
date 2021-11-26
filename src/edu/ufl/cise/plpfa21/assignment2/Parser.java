@@ -168,10 +168,27 @@ public class Parser implements IPLPParser{
 					IExpression right = b.getRight();
 					b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), left.getText() + "-" + right.getText(), ex, ex1, t.getKind());
 				}
-				else if(t.getKind() == Kind.DIV) {
+				
+				else if(t.getKind() == Kind.OR) {
 					IExpression left = b.getLeft();
 					IExpression right = b.getRight();
-					b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), left.getText() + "/" + right.getText(), ex, ex1, t.getKind());
+					if(map.containsKey(left.getText())) {
+						left = map.get(left.getText());
+					}
+					if(map.containsKey(right.getText())) {
+						right = map.get(right.getText());
+					}
+					String s = "";
+					boolean leftBool = Boolean.parseBoolean(left.getText());
+					boolean rightBool = Boolean.parseBoolean(right.getText());
+					if(leftBool || rightBool) {
+						s = "true";
+					}
+					else {
+						s = "false";
+					}
+					b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), s, left, right, Kind.OR);
+					
 				}
 				return b;
 			}
@@ -231,6 +248,18 @@ public class Parser implements IPLPParser{
 						}
 						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), s, left, right, Kind.AND);
 						
+					}
+					else if(t.getKind() == Kind.DIV) {
+						IExpression left = b.getLeft();
+						IExpression right = b.getRight();
+						if(map.containsKey(left.getText()) && map.containsKey(right.getText())) {
+							left = map.get(left.getText());
+							right = map.get(right.getText());
+						}
+//						boolean leftDigit = Character.isDigit(map.get(left.getText()).getText().charAt(0));
+//						boolean rightDigit = Character.isDigit(map.get(right.getText()).getText().charAt(0));
+						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), Integer.toString(Integer.parseInt(left.getText()) / Integer.parseInt(right.getText())), left, right, Kind.DIV);
+
 					}
 					return b;
 			}
