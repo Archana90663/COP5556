@@ -18,15 +18,6 @@ import edu.ufl.cise.plpfa21.assignment3.ast.IStatement;
 import edu.ufl.cise.plpfa21.assignment3.ast.IType;
 import edu.ufl.cise.plpfa21.assignment3.ast.IType.TypeKind;
 import edu.ufl.cise.plpfa21.assignment3.astimpl.*;
-import edu.ufl.cise.plpfa21.assignment3.astimpl.Block__;
-import edu.ufl.cise.plpfa21.assignment3.astimpl.BooleanLiteralExpression__;
-import edu.ufl.cise.plpfa21.assignment3.astimpl.Declaration__;
-import edu.ufl.cise.plpfa21.assignment3.astimpl.Expression__;
-import edu.ufl.cise.plpfa21.assignment3.astimpl.IdentExpression__;
-import edu.ufl.cise.plpfa21.assignment3.astimpl.Identifier__;
-import edu.ufl.cise.plpfa21.assignment3.astimpl.IntLiteralExpression__;
-import edu.ufl.cise.plpfa21.assignment3.astimpl.Program__;
-import edu.ufl.cise.plpfa21.assignment3.astimpl.Statement__;
 import edu.ufl.cise.plpfa21.assignment1.PLPTokenKinds.Kind;
 
 
@@ -112,9 +103,9 @@ public class Parser implements IPLPParser{
 						right = map.get(right.getText());
 					}
 					
-					boolean leftDigit = (left.getText().equals("TRUE") || left.getText().equals("FALSE"));
-					boolean rightDigit = (right.getText().equals("TRUE") || right.getText().equals("FALSE"));
-					if(leftDigit && rightDigit) {
+//					boolean leftDigit = (left.getText().equals("TRUE") || left.getText().equals("FALSE"));
+//					boolean rightDigit = (right.getText().equals("TRUE") || right.getText().equals("FALSE"));
+//					if(leftDigit && rightDigit) {
 						String s = "";
 						if(left.getText().equals(right.getText())) {
 							s = "false";
@@ -123,16 +114,18 @@ public class Parser implements IPLPParser{
 							s = "true";
 						}
 						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), s, left, right, Kind.NOT_EQUALS);
+						
+					}
+					return b;
 
-					}
-					else {
-						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), map.get(left.getText()).getText() + map.get(right.getText()).getText(), ex, ex1, t.getKind());
-					}
+//					else {
+//						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), map.get(left.getText()).getText() + map.get(right.getText()).getText(), ex, ex1, t.getKind());
+//					}
 				}
-				return b;
-			}
 			return ex;
-		} 
+
+			}
+		
 		
 	
 	IExpression trm() throws SyntaxException{
@@ -191,6 +184,7 @@ public class Parser implements IPLPParser{
 		IPLPToken first = this.token;
 		IExpression ex=null;
 		IExpression ex1=null;
+		BinaryExpression__ b = null;
 		ex = factor();
 				while(this.token.getKind() == Kind.TIMES || this.token.getKind() == Kind.DIV || this.token.getKind() == Kind.AND) {
 					IPLPToken t = this.token;
@@ -199,6 +193,27 @@ public class Parser implements IPLPParser{
 //					equal(Kind.AND);
 					ex1 = factor();
 					ex = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex, ex1, t.getKind());
+					b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex, ex1, t.getKind());
+					if(t.getKind() == Kind.TIMES) {
+						IExpression left = b.getLeft();
+						IExpression right = b.getRight();
+						if(map.containsKey(left.getText()) && map.containsKey(right.getText())) {
+							left = map.get(left.getText());
+							right = map.get(right.getText());
+						}
+//						boolean leftDigit = Character.isDigit(map.get(left.getText()).getText().charAt(0));
+//						boolean rightDigit = Character.isDigit(map.get(right.getText()).getText().charAt(0));
+						boolean leftDigit = Character.isDigit(left.getText().charAt(0));
+						boolean rightDigit = Character.isDigit(right.getText().charAt(0));
+						if(leftDigit && rightDigit) {
+							b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), Integer.toString(Integer.parseInt(left.getText()) * Integer.parseInt(right.getText())), left, right, Kind.TIMES);
+
+						}
+						else {
+						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), map.get(left.getText()).getText() + map.get(right.getText()).getText(), ex, ex1, t.getKind());
+					}
+						return b;
+				}
 			}
 		
 		return ex;
@@ -445,7 +460,7 @@ public class Parser implements IPLPParser{
 					}
 					else {
 						nextOne();
-						if(this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE) {
+						if(this.token.getKind() == Kind.IDENTIFIER || this.token.getKind() == Kind.INT_LITERAL || this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE) {
 							ex = expr();
 						}
 					}
@@ -462,11 +477,11 @@ public class Parser implements IPLPParser{
 				}
 			}
 			TypeKind type = IType.TypeKind.STRING;
-			if(Character.isDigit(ex.getText().charAt(0))) {
-				type = IType.TypeKind.INT;
-			}
 			if(ex.getText().equals("TRUE") || ex.getText().equals("FALSE") || ex.getText().equals("true") || ex.getText().equals("false")) {
 				type = IType.TypeKind.BOOLEAN;
+			}
+			if(Character.isDigit(ex.getText().charAt(0))) {
+				type = IType.TypeKind.INT;
 			}
 //			if(t.getKind() == Kind.KW_INT || t.getKind() == Kind.INT_LITERAL) {
 //				type = IType.TypeKind.INT;
