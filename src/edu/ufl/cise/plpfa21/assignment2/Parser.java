@@ -62,6 +62,7 @@ public class Parser implements IPLPParser{
 		IExpression ex = null;
 		IExpression ex1 = null;
 		BinaryExpression__ b = null;
+		IExpression e=null;
 		ex = trm();
 			while(this.token.getKind() == Kind.LT || this.token.getKind() == Kind.GT || this.token.getKind() == Kind.EQUALS || this.token.getKind() == Kind.NOT_EQUALS) {
 				IPLPToken t = this.token;
@@ -81,17 +82,50 @@ public class Parser implements IPLPParser{
 					if(map.containsKey(right.getText())) {
 						right = map.get(right.getText());
 					}
-					
-					boolean leftDigit = (left.getText().equals("TRUE") || left.getText().equals("FALSE"));
-					boolean rightDigit = (right.getText().equals("TRUE") || right.getText().equals("FALSE"));
-					if(leftDigit && rightDigit) {
-						String s = Boolean.toString(left.getText().equals(right.getText()));
-						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), s, left, right, Kind.EQUALS);
-
+					if(Character.isLetter(left.getText().charAt(0)) || Character.isLetter(right.getText().charAt(0))) {
+						String s = "";
+						if(left.getText().equals(right.getText())) {
+							s = "true";
+						}
+						else {
+							s = "false";
+						}
+						e = new BooleanLiteralExpression__(left.getLine(), left.getPosInLine(), s, Boolean.parseBoolean(s));
+						return e;
 					}
-					else {
-						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), map.get(left.getText()).getText() + map.get(right.getText()).getText(), ex, ex1, t.getKind());
+					else if(Character.isDigit(left.getText().charAt(0)) || Character.isDigit(right.getText().charAt(0))) {
+						int intLeft = Integer.parseInt(left.getText());
+						int intRight = Integer.parseInt(right.getText());
+						String s="";
+						if(intLeft == intRight) {
+							s = "true";
+						}
+						else {
+							s ="false";
+						}
+						e = new BooleanLiteralExpression__(left.getLine(), left.getPosInLine(), s, Boolean.parseBoolean(s));
+						return e;
 					}
+						
+//					IExpression left = b.getLeft();
+//					IExpression right = b.getRight();
+//					if(map.containsKey(left.getText())) {
+//						left = map.get(left.getText());
+//					}
+//					if(map.containsKey(right.getText())) {
+//						right = map.get(right.getText());
+//					}
+//					
+//					boolean leftDigit = (left.getText().equals("TRUE") || left.getText().equals("FALSE"));
+//					boolean rightDigit = (right.getText().equals("TRUE") || right.getText().equals("FALSE"));
+//					if(leftDigit && rightDigit) {
+//						String s = Boolean.toString(left.getText().equals(right.getText()));
+//						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), s, left, right, Kind.EQUALS);
+//
+//					}
+//					else {
+//						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), map.get(left.getText()).getText() + map.get(right.getText()).getText(), ex, ex1, t.getKind());
+//					}
 				}
 				else if(t.getKind() == Kind.NOT_EQUALS) {
 					IExpression left = b.getLeft();
@@ -102,10 +136,6 @@ public class Parser implements IPLPParser{
 					if(map.containsKey(right.getText())) {
 						right = map.get(right.getText());
 					}
-					
-//					boolean leftDigit = (left.getText().equals("TRUE") || left.getText().equals("FALSE"));
-//					boolean rightDigit = (right.getText().equals("TRUE") || right.getText().equals("FALSE"));
-//					if(leftDigit && rightDigit) {
 						String s = "";
 						if(left.getText().equals(right.getText())) {
 							s = "false";
@@ -113,14 +143,84 @@ public class Parser implements IPLPParser{
 						else {
 							s = "true";
 						}
-						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), s, left, right, Kind.NOT_EQUALS);
-						
+						e = new BooleanLiteralExpression__(left.getLine(), left.getPosInLine(), s, Boolean.parseBoolean(s));
+						return e;
 					}
+				else if(t.getKind() == Kind.LT) {
+					IExpression left = b.getLeft();
+					IExpression right = b.getRight();
+					if(map.containsKey(left.getText())) {
+						left = map.get(left.getText());
+					}
+					if(map.containsKey(right.getText())) {
+						right = map.get(right.getText());
+					}
+					if(Character.isDigit(left.getText().charAt(0)) || Character.isDigit(right.getText().charAt(0))) {
+						int intLeft = Integer.parseInt(left.getText());
+						int intRight = Integer.parseInt(right.getText());
+						String s = "";
+						if(intLeft < intRight) {
+							s = "true";
+						}
+						else {
+							s = "false";
+						}
+						e = new BooleanLiteralExpression__(left.getLine(), left.getPosInLine(), s, Boolean.parseBoolean(s));
+//						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), s, left, right, Kind.LT);
+						return e;
+					}
+					else if(Character.isLetter(left.getText().charAt(0)) || Character.isLetter(right.getText().charAt(0))) {
+						String s = "";
+						if(left.getText().compareTo(right.getText()) <=0) {
+							s = "true";
+						}
+						else {
+							s = "false";
+						}
+						e = new BooleanLiteralExpression__(left.getLine(), left.getPosInLine(), s, Boolean.parseBoolean(s));
+						return e;
+					}
+		
+						
+				}
+				else if(t.getKind() == Kind.GT) {
+					IExpression left = b.getLeft();
+					IExpression right = b.getRight();
+					if(map.containsKey(left.getText())) {
+						left = map.get(left.getText());
+					}
+					if(map.containsKey(right.getText())) {
+						right = map.get(right.getText());
+					}
+					if(Character.isDigit(left.getText().charAt(0)) || Character.isDigit(right.getText().charAt(0))) {
+						int intLeft = Integer.parseInt(left.getText());
+						int intRight = Integer.parseInt(right.getText());
+						String s = "";
+						if(intLeft > intRight) {
+							s = "true";
+						}
+						else {
+							s = "false";
+						}
+						e = new BooleanLiteralExpression__(left.getLine(), left.getPosInLine(), s, Boolean.parseBoolean(s));
+						return e;
+					}
+					else if(Character.isLetter(left.getText().charAt(0)) || Character.isLetter(right.getText().charAt(0))) {
+						String s = "";
+						if(left.getText().compareTo(right.getText()) >=0) {
+							s = "true";
+						}
+						else {
+							s = "false";
+						}
+						e = new BooleanLiteralExpression__(left.getLine(), left.getPosInLine(), s, Boolean.parseBoolean(s));
+						return e;
+					}
+		
+						
+				}
 					return b;
 
-//					else {
-//						b = new BinaryExpression__(first.getLine(), first.getCharPositionInLine(), map.get(left.getText()).getText() + map.get(right.getText()).getText(), ex, ex1, t.getKind());
-//					}
 				}
 			return ex;
 
