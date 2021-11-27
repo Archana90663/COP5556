@@ -485,7 +485,11 @@ public class Parser implements IPLPParser{
 //					IStatement s = stmt();
 //					statementList.add(s);
 //				}
-				while(this.token.getKind() != Kind.IDENTIFIER) {
+				if(this.token.getKind() == Kind.KW_RETURN) {
+					b = new Block__(first.getLine(), first.getCharPositionInLine(), first.getText(), statementList);
+					return b;
+				}
+				while(this.token.getKind() != Kind.IDENTIFIER && this.token.getKind() != Kind.KW_TRUE && this.token.getKind() != Kind.KW_FALSE) {
 					nextOne();
 				}
 				IStatement s = stmt();
@@ -494,7 +498,7 @@ public class Parser implements IPLPParser{
 //					throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
 //				}
 //			}
-			equal(Kind.SEMI);
+//			equal(Kind.SEMI);
 			b = new Block__(first.getLine(), first.getCharPositionInLine(), first.getText(), statementList);
 		} catch(SyntaxException e) {
 			throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
@@ -587,6 +591,9 @@ public class Parser implements IPLPParser{
 						if(this.token.getKind() == Kind.ASSIGN) {
 							ex = expr();
 						}
+						else {
+							return null;
+						}
 					}
 				}
 			}
@@ -615,10 +622,13 @@ public class Parser implements IPLPParser{
 			}
 			IExpression ex = null;
 			IBlock block = blck();
-			String tt = block.getStatements().get(0).getText();
-			if(map.containsKey(tt)) {
-				ex = map.get(tt);
+			if(this.token.getKind()== Kind.KW_RETURN) {
+				nextOne();
+				ex = expr();
+				ReturnStatement__ s = new ReturnStatement__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex);
+				block.getStatements().add(s);
 			}
+//			String tt = block.getStatements().get(0).getText();
 			TypeKind type = IType.TypeKind.STRING;
 			if(ex.getText().equals("TRUE") || ex.getText().equals("FALSE") || ex.getText().equals("true") || ex.getText().equals("false")) {
 				type = IType.TypeKind.BOOLEAN;
@@ -626,12 +636,29 @@ public class Parser implements IPLPParser{
 			if(Character.isDigit(ex.getText().charAt(0))) {
 				type = IType.TypeKind.INT;
 			}
+//			if(map.containsKey(tt)) {
+//				ex = map.get(tt);
+//				if(ex.getText().equals("TRUE") || ex.getText().equals("FALSE") || ex.getText().equals("true") || ex.getText().equals("false")) {
+//					type = IType.TypeKind.BOOLEAN;
+//				}
+//				if(Character.isDigit(ex.getText().charAt(0))) {
+//					type = IType.TypeKind.INT;
+//				}
+//			}
+//			else {
+//				if(tt.equals("TRUE") || tt.equals("FALSE") || tt.equals("true") || tt.equals("false")) {
+//					type = IType.TypeKind.BOOLEAN;
+//				}
+//				if(Character.isDigit(tt.charAt(0))) {
+//					type = IType.TypeKind.INT;
+//				}
+//			}
 
 			Identifier__ ident = new Identifier__(ex.getLine(), ex.getPosInLine(), ex.getText(), first.getText());
-			PrimitiveType__ tokenType = new PrimitiveType__(ex.getLine(),ex.getPosInLine() , ex.getText(), type);
-		
+			PrimitiveType__ tokenType = new PrimitiveType__(ex.getLine(), ex.getPosInLine(), ex.getText(), type);
+			ex.setType(tokenType);
 			d = new FunctionDeclaration___(first.getLine(), first.getCharPositionInLine(), first.getText(), ident, new ArrayList<>(), tokenType, block);
-			map.put(first.getText(), ex);
+//			map.put(first.getText(), ex);
 		}
 		
 		
@@ -838,7 +865,9 @@ public class Parser implements IPLPParser{
 //			if(this.token.getKind() == Kind.KW_INT || this.token.getKind() == Kind.KW_BOOLEAN) {
 			if(this.token.getKind() == Kind.KW_VAL || this.token.getKind() == Kind.KW_VAR || this.token.getKind() == Kind.KW_INT || this.token.getKind() == Kind.KW_BOOLEAN || this.token.getKind() == Kind.KW_STRING || this.token.getKind() == Kind.KW_FUN) {	
 				dec = declarationMethod();
-				list.add(dec);
+				if(dec!=null) {
+					list.add(dec);
+				}
 				while(this.token.getKind() != Kind.EOF) {
 					nextOne();
 					dec = declarationMethod();
@@ -900,7 +929,53 @@ public class Parser implements IPLPParser{
 			case IDENTIFIER:
 				try {
 					IExpression ex = null;
-					ex = expr();
+					IPLPToken next=null;
+					try {
+						next = lexer.nextToken();
+					} catch (LexicalException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(next.getKind() == Kind.ASSIGN) {
+						s = assignStatementMethod();
+						return s;
+					}
+					else {
+						ex = expr();
+					}
+					s = new ReturnStatement__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex);
+//					if(t.getKind() == Kind.ASSIGN) {
+//						s = assignStatementMethod();
+//						equal(Kind.SEMI);
+//						
+//					}
+//					else {
+//						throw new SyntaxException("",this.token.getLine(), this.token.getCharPositionInLine());
+//					}
+					
+				} catch(SyntaxException e) {
+					throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
+
+				}
+				break;
+			case KW_TRUE:
+				try {
+					IExpression ex = null;
+					IPLPToken next=null;
+					try {
+						next = lexer.nextToken();
+					} catch (LexicalException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(next.getKind() == Kind.SEMI) {
+						ex = expr();
+						map.put(first.getText(), ex);
+
+					}
+//					else {
+//						ex = expr();
+//					}
 					s = new ReturnStatement__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex);
 //					if(t.getKind() == Kind.ASSIGN) {
 //						s = assignStatementMethod();
@@ -925,15 +1000,16 @@ public class Parser implements IPLPParser{
 	public AssignmentStatement__ assignStatementMethod() throws SyntaxException{
 		IPLPToken first = this.token;
 		AssignmentStatement__ as = null;
-		if(this.token.getKind() == Kind.IDENTIFIER) {
+		if(this.token.getKind() == Kind.IDENTIFIER || this.token.getKind() == Kind.KW_TRUE || this.token.getKind() == Kind.KW_FALSE) {
 			try {
 				IPLPToken i = this.token;
-				nextOne();
-				equal(Kind.ASSIGN);
+//				nextOne();
+//				equal(Kind.ASSIGN);
 				IExpression ex = expr();
-				Identifier__ ident = new Identifier__(first.getLine(), first.getCharPositionInLine(), first.getStringValue(), first.getText());
-				IdentExpression__ identValue = new IdentExpression__(i.getLine(), i.getCharPositionInLine(), i.getText(), ident);
+				Identifier__ ident = new Identifier__(ex.getLine(), ex.getPosInLine(), ex.getText(), first.getText());
+				IdentExpression__ identValue = new IdentExpression__(ex.getLine(), ex.getPosInLine(), ex.getText(), ident);
 				as = new AssignmentStatement__(first.getLine(), first.getCharPositionInLine(), first.getText(), identValue, ex);
+				map.put(first.getText(), ex);
 				
 			} catch(SyntaxException e) {
 				throw new SyntaxException("",first.getLine(), first.getCharPositionInLine());
