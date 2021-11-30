@@ -929,21 +929,21 @@ public class Parser implements IPLPParser{
 			case IDENTIFIER:
 				try {
 					IExpression ex = null;
-					IPLPToken next=null;
-					try {
-						next = lexer.nextToken();
-					} catch (LexicalException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					if(next.getKind() == Kind.ASSIGN) {
-						s = assignStatementMethod();
-						return s;
-					}
-					else {
-						ex = expr();
-					}
-					s = new ReturnStatement__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex);
+//					IPLPToken next=null;
+//					try {
+//						next = lexer.nextToken();
+//					} catch (LexicalException e) {
+//						e.printStackTrace();
+//					}
+//					if(next.getKind() == Kind.ASSIGN) {
+//						s = assignStatementMethod();
+//						return s;
+//					}
+					s = assignStatementMethod();
+//					else {
+//						ex = expr();
+//					}
+//					s = new ReturnStatement__(first.getLine(), first.getCharPositionInLine(), first.getText(), ex);
 //					if(t.getKind() == Kind.ASSIGN) {
 //						s = assignStatementMethod();
 //						equal(Kind.SEMI);

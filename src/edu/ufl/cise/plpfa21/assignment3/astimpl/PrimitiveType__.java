@@ -69,5 +69,21 @@ public class PrimitiveType__ extends Type__ implements IPrimitiveType {
 	public static final PrimitiveType__ intType = new PrimitiveType__(0,0,"INT",TypeKind.INT);
 	public static final PrimitiveType__ booleanType = new PrimitiveType__(0,0,"BOOLEAN",TypeKind.BOOLEAN);
 	public static final PrimitiveType__ stringType = new PrimitiveType__(0,0,"STRING",TypeKind.STRING);
+	
+	@Override
+	public String getDesc() throws Exception {
+		if(isInt()) return "I";
+		if(isBoolean()) return "Z";
+		if(isString()) return "Ljava/lang/String;";
+		throw new Exception("problem in PrimitiveType.getDesc");
+	}
+	
+	@Override
+	public String getClassName() throws Exception {
+		if(isInt()) return "java/lang/Integer";
+		if(isBoolean()) return "java/lang/Boolean";
+		if(isString()) return "java/lang/String";
+		throw new Exception("problem in PrimitiveType.getClassName");		
+	}
 
 }

@@ -17,4 +17,7 @@ public interface IType extends IASTNode {
 	boolean isList();
 	boolean isKind(TypeKind kind);
 	
+	String getDesc() throws Exception;
+	String getClassName() throws Exception;
+	
 }

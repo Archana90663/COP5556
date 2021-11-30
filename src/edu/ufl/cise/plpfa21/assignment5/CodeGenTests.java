@@ -772,7 +772,7 @@ public class CodeGenTests {
 		String input = """
 				VAR x = TRUE;
 				VAR y = (TRUE && x);
-				VAR z = (FALSE && x);
+				VAR z = (FALSE && x)
 				VAR a = (x && TRUE);
 				VAR b = (x && FALSE);
 				VAR c = (FALSE && b);
@@ -798,6 +798,7 @@ public class CodeGenTests {
 				VAR a = (FALSE || x);
 				VAR b = (x || FALSE);
 				VAR c = (t || z);
+
 				""";
 		byte[] bytecode = compile(input, className, packageName);
 		show(CodeGenUtils.bytecodeToString(bytecode));

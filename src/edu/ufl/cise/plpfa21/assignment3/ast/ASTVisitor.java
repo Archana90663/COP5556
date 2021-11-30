@@ -6,7 +6,7 @@ public interface ASTVisitor {
     Object visitIBinaryExpression(IBinaryExpression n, Object arg)throws Exception;
     Object visitIBlock(IBlock n, Object arg)throws Exception;
     Object visitIBooleanLiteralExpression(IBooleanLiteralExpression n, Object arg)throws Exception;
-//    Object visitIExpressionStatement(IExpressionStatement n, Object arg)throws Exception;
+    Object visitIExpressionStatement(IExpressionStatement n, Object arg)throws Exception;
     Object visitIFunctionDeclaration(IFunctionDeclaration n, Object arg)throws Exception;
     Object visitIFunctionCallExpression(IFunctionCallExpression n, Object arg)throws Exception;
     Object visitIIdentExpression(IIdentExpression n, Object arg)throws Exception;

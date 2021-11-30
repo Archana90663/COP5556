@@ -50,7 +50,20 @@ public class ListType__ extends Type__ implements IListType {
 		return Objects.equals(elementType, other.elementType);
 	}
 	
+//	@Override
+//	public String getDesc() throws Exception {
+//		return "[" + elementType.getDesc();
+//	}
 	
+	@Override
+	public String getDesc() throws Exception {
+		return "Ljava/util/ArrayList;";
+	}
+	
+	@Override
+	public String getClassName() throws Exception {
+		return "java/util/ArrayList";
+	}
 	
 
 }

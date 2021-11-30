@@ -324,7 +324,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		if(declaration != null) {
 			// set IReturnStatement's declaration to "declaration"
 			IType declarationType  = n.getExpression().getType();
-			if(!(declarationType.isKind(IType.TypeKind.INT) && declarationType.isKind(IType.TypeKind.BOOLEAN))) {
+			if(!(declarationType.isKind(IType.TypeKind.INT) || declarationType.isKind(IType.TypeKind.BOOLEAN) || declarationType.isKind(IType.TypeKind.STRING))) {
 				throw new TypeCheckException("Return type is incorrect");
 			}
 			return declarationType;

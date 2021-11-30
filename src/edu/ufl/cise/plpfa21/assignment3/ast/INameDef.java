@@ -5,4 +5,5 @@ public interface INameDef extends IDeclaration {
 	IIdentifier getIdent();
 	IType getType();
 	void setType(IType type);
+
 }
