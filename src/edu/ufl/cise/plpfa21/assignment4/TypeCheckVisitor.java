@@ -59,6 +59,12 @@ public class TypeCheckVisitor implements ASTVisitor {
 			throw new TypeCheckException(message);
 		}
 	}
+	
+	public SymbolTable getSymTab() {
+		return symtab;
+	}
+	
+	int slot=0;
 
 	@Override
 	public Object visitIBinaryExpression(IBinaryExpression n, Object arg) throws Exception {
@@ -183,7 +189,11 @@ public class TypeCheckVisitor implements ASTVisitor {
 		IIdentifier name = n.getName();
 		IDeclaration dec = (IDeclaration) name.visit(this, null);
 		IType type = getType(dec);
-		check(type != Type__.undefinedType, n, "Identifier " + name + " does not have defined type");
+		n.getName().setDec(dec);
+//		check(type != Type__.undefinedType, n, "Identifier " + name + " does not have defined type");
+		if(dec == null) {
+			type = n.getType();
+		}
 		n.setType(type);
 		return type;
 	}
@@ -323,7 +333,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		IDeclaration declaration = symtab.lookupDec(n.getText());
 		if(declaration != null) {
 			// set IReturnStatement's declaration to "declaration"
-			IType declarationType  = n.getExpression().getType();
+			IType declarationType  = (Type__)n.getExpression().visit(this, arg);
 			if(!(declarationType.isKind(IType.TypeKind.INT) || declarationType.isKind(IType.TypeKind.BOOLEAN) || declarationType.isKind(IType.TypeKind.STRING))) {
 				throw new TypeCheckException("Return type is incorrect");
 			}
@@ -414,12 +424,19 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitIMutableGlobal(IMutableGlobal n, Object arg) throws Exception {
-		IExpression expression = n.getExpression();
-		IType expressionType = expression != null ? (IType) expression.visit(this, arg) : Type__.undefinedType;
-		INameDef def = n.getVarDef();
-		IType declaredType = (IType) def.visit(this, n);
+//		IExpression expression = n.getExpression();
+//		IType expressionType = expression != null ? (IType) expression.visit(this, arg) : Type__.undefinedType;
+//		INameDef def = n.getVarDef();
+//		IType declaredType = (IType) def.visit(this, n);
+//		IType inferredType = unifyAndCheck(declaredType, expressionType, n);
+//		def.setType(inferredType);
+//		return null;
+		IExpression expression = n.getExpression(); // IIMutableGlobal must have initalizing expression
+		IType expressionType = (IType) expression.visit(this, arg);
+		INameDef nameDef = n.getVarDef();
+		IType declaredType = (IType) nameDef.visit(this, n);
 		IType inferredType = unifyAndCheck(declaredType, expressionType, n);
-		def.setType(inferredType);
+		nameDef.setType(inferredType);
 		return null;
 	}
 
@@ -513,7 +530,8 @@ public class TypeCheckVisitor implements ASTVisitor {
 	public Object visitIIdentifier(IIdentifier n, Object arg) throws Exception {
 		String name = n.getName();
 		IDeclaration dec = symtab.lookupDec(name);
-		check(dec != null, n, "identifier not declared");
+//		check(dec != null, n, "identifier not declared");
+		n.setDec(dec);
 		return dec;
 	}
 

@@ -52,11 +52,11 @@ public class Lexer implements IPLPLexer {
 							start_line = position+1;
 							position = position+1;
 							break;
-						case '\"':
-							startLineArray.add(start_line);
-							start_line = position+1;
-							position = position+1;
-							break;
+//						case '\"':
+//							startLineArray.add(start_line);
+//							start_line = position+1;
+//							position = position+1;
+//							break;
 						case ';':
 							tokensList.add(new Token(Kind.SEMI, start, newLength));
 							position = position+1;
@@ -105,10 +105,12 @@ public class Lexer implements IPLPLexer {
 							state = State.and;
 							position = position+1;
 							break;
-//						case '\"':
-//							state = State.string_start;
-//							position = position+1;
-//							break;
+						case '\"':
+							state = State.string_start;
+							startLineArray.add(start_line);
+							start_line = position+1;
+							position = position+1;
+							break;
 						case '=':
 							state = State.equal_sign;
 							position = position+1;
@@ -191,7 +193,7 @@ public class Lexer implements IPLPLexer {
 							tokensList.add(new Token(Kind.STRING_LITERAL, start, position-start));
 							state = State.start;
 						}
-						else if(Character.isJavaIdentifierPart(c)){
+						else if(Character.isJavaIdentifierPart(c) || Character.isWhitespace(c) || c=='!'){
 							state = State.string_literal;
 							position = position+1;
 						}
@@ -221,7 +223,7 @@ public class Lexer implements IPLPLexer {
 						}
 						else {
 							tokensList.add(new Token(Kind.ASSIGN, start, position-start));
-							position = position+1;
+//							position = position+1;
 							state = State.start;
 //							tokensList.add(t);
 						}
@@ -230,6 +232,9 @@ public class Lexer implements IPLPLexer {
 						if(c == '=') {
 							tokensList.add(new Token(Kind.NOT_EQUALS, start, newLength+1));
 							position = position+1;
+						}
+						else {
+							tokensList.add(new Token(Kind.STRING_LITERAL, start, position-start));
 						}
 						state = State.start;
 						break;
@@ -261,10 +266,12 @@ public class Lexer implements IPLPLexer {
 						position = position+1;
 						break;
 					case string_literal:
-						if(!Character.isJavaIdentifierPart(c)) {
+//						if(!Character.isJavaIdentifierPart(c)) {
+						if(c == '\"') {
 							String str = globalInput.substring(start, position);
-							tokensList.add(new Token(Kind.STRING_LITERAL, start, position-start));
+							tokensList.add(new Token(Kind.STRING_LITERAL, start+1, position-start-1));
 							state = State.start;
+							position = position+1;
 						}
 						else {
 							position = position+1;

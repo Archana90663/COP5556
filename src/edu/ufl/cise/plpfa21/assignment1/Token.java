@@ -77,13 +77,14 @@ public class Token implements IPLPToken{
 		 * 
 		 * @return the string value of this token
 		 */
-		if(getKind() == Kind.STRING_LITERAL) {
+		if(getKind() == Kind.STRING_LITERAL || getKind() == Kind.IDENTIFIER) {
 			String s = getText();
 			StringBuilder sb = new StringBuilder();
 			for(char c : s.toCharArray()) {
-				if(Character.isLetter(c)) {
-					sb.append(c);
-				}
+				sb.append(c);
+//				if(Character.isLetter(c) || Character.isWhitespace(c)) {
+//					sb.append(c);
+//				}
 			}
 			return sb.toString();
 		}

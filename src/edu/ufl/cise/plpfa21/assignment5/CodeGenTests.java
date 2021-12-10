@@ -395,6 +395,7 @@ public class CodeGenTests {
 				   RETURN x;
 				END
 				""";
+//		String input="\"guten Tag\"";
 		byte[] bytecode = compile(input, className, packageName);
 		show(CodeGenUtils.bytecodeToString(bytecode));
 		String x = (String) loadClassAndRunMethod(bytecode, className, "f", null);
@@ -492,6 +493,7 @@ public class CodeGenTests {
 				   x="Gruetzi";
 				END
 				""";
+
 		byte[] bytecode = compile(input, className, packageName);
 		show(CodeGenUtils.bytecodeToString(bytecode));
 		Class<?> testClass = getClass(bytecode, className);
@@ -539,7 +541,7 @@ public class CodeGenTests {
 		String input = """
 				FUN f():BOOLEAN
 				DO
-				   RETURN ! TRUE;
+				   RETURN !TRUE;
 				END
 				""";
 		byte[] bytecode = compile(input, className, packageName);
@@ -1260,6 +1262,70 @@ public class CodeGenTests {
 		Class<?> testClass = getClass(bytecode, className);
 		runMethod(testClass, "main", params);
 		assertEquals(5, getInt(testClass, "y"));
+	}
+	
+	@DisplayName("Archana_Dhyani_test0")
+	@Test
+	public void Archana_Dhyani_test0(TestInfo testInfo) throws Exception {
+		String input = """
+				FUN g(x:STRING, y:STRING):STRING
+				DO
+				   RETURN x+y;
+				END
+				""";
+		byte[] bytecode = compile(input, className, packageName);
+		show(CodeGenUtils.bytecodeToString(bytecode));
+		Object[] params = { "Hello ", "World" };
+		String result = (String) loadClassAndRunMethod(bytecode, className, "g", params);
+		assertEquals("Hello World", result);
+	}
+	
+	@DisplayName("Archana_Dhyani_test1")
+	@Test
+	public void Archana_Dhyani_test1(TestInfo testInfo) throws Exception {
+		String input = """
+				FUN g(x:INT, y:INT):INT
+				DO
+				   RETURN x-y;
+				END
+				""";
+		byte[] bytecode = compile(input, className, packageName);
+		show(CodeGenUtils.bytecodeToString(bytecode));
+		Object[] params = { 10, 3 };
+		int result = (int) loadClassAndRunMethod(bytecode, className, "g", params);
+		assertEquals(7, result);
+	}
+	
+	@DisplayName("Archana_Dhyani_test3")
+	@Test
+	public void Archana_Dhyani_test2(TestInfo testInfo) throws Exception {
+		String input = """
+				FUN g(x:BOOLEAN, y:BOOLEAN):BOOLEAN
+				DO
+				   RETURN x && y;
+				END
+				""";
+		byte[] bytecode = compile(input, className, packageName);
+		show(CodeGenUtils.bytecodeToString(bytecode));
+		Object[] params = { true, false };
+		boolean result = (boolean) loadClassAndRunMethod(bytecode, className, "g", params);
+		assertEquals(false, result);
+	}
+	
+	@DisplayName("Archana_Dhyani_test4")
+	@Test
+	public void Archana_Dhyani_test4(TestInfo testInfo) throws Exception {
+		String input = """
+				FUN g(x:STRING):BOOLEAN
+				DO
+				   RETURN x=="Hello";
+				END
+				""";
+		byte[] bytecode = compile(input, className, packageName);
+		show(CodeGenUtils.bytecodeToString(bytecode));
+		Object[] params = {"Hello"};
+		boolean result = (boolean) loadClassAndRunMethod(bytecode, className, "g", params);
+		assertEquals(true, result);
 	}
 
 
